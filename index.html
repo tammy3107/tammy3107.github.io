@@ -4,7 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tanmoy Das | Portfolio</title>
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts (Inter) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
   <meta name="description" content="Portfolio website for Tanmoy Das, Computer Vision and Machine Learning Researcher."/>
   <link rel="icon" href="https://avatars.githubusercontent.com/u/18425313?v=4"/>
@@ -13,11 +17,18 @@
     .fade-in { opacity: 0; transform: translateY(30px); transition: all 1s cubic-bezier(.4,0,.2,1); }
     .fade-in.visible { opacity: 1; transform: translateY(0); }
     ::selection { background: #22d3ee44; }
-    /* Custom scrollbar for modern feel */
+    /* Custom scrollbar */
     ::-webkit-scrollbar { width: 8px; background: #18181b; }
     ::-webkit-scrollbar-thumb { background: #22d3ee88; border-radius: 8px; }
-    /* Hide dropdown on click outside */
     .dropdown:not(:hover):not(.open) .dropdown-menu { display: none; }
+    @keyframes skill-pop {
+      from { opacity: 0; transform: translateY(20px) scale(0.97);}
+      to   { opacity: 1; transform: translateY(0) scale(1);}
+    }
+    #skills-list .animate-in {
+      opacity: 1 !important;
+      transform: translateY(0) scale(1) !important;
+    }
   </style>
 </head>
 <body class="bg-gray-950 text-gray-100 font-sans">
@@ -46,7 +57,6 @@
           <li>
             <a href="#blog2" class="block px-4 py-2 text-sm hover:bg-cyan-900/20 transition">Understanding Diffusion Models in AI</a>
           </li>
-          <!-- Add more blog links here as needed -->
         </ul>
       </li>
     </ul>
@@ -58,9 +68,9 @@
     <h1 class="text-4xl font-black tracking-tight mb-1">Tanmoy Das</h1>
     <p class="text-lg text-cyan-400 mb-3 font-semibold">Computer Vision & Deep Learning Researcher</p>
     <div class="flex justify-center gap-5 mt-3">
-      <a href="https://github.com/tammy3107" target="_blank" aria-label="GitHub" class="hover:text-cyan-400"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5A12 12 0 0 0 0 12.6c0 5.4 3.5 10 8.2 11.6.6.1.8-.2.8-.6v-2c-3.3.7-4-1.6-4-1.6-.5-1.2-1.2-1.5-1.2-1.5-1-.7.1-.7.1-.7 1 .1 1.6 1 1.6 1 .9 1.5 2.4 1.1 3 .9.1-.7.3-1.1.5-1.3-2.6-.3-5.3-1.3-5.3-5.9 0-1.3.5-2.4 1.2-3.2 0-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2.9-.3 1.8-.4 2.8-.4.9 0 1.9.1 2.8.4 2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.7.8 1.2 1.9 1.2 3.2 0 4.7-2.7 5.6-5.3 5.9.3.2.6.7.6 1.5v2.2c0 .4.2.7.8.6C20.5 22.6 24 18 24 12.6A12 12 0 0 0 12 .5z"/></svg></a>
-      <a href="https://www.linkedin.com/in/tanmoy-das-15926014a/" target="_blank" aria-label="LinkedIn" class="hover:text-cyan-400"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.8 0-5 2.2-5 5v14c0 2.8 2.2 5 5 5h14c2.8 0 5-2.2 5-5v-14c0-2.8-2.2-5-5-5zm-11.4 20h-2.8v-8.8h2.8v8.8zm-1.4-10.2c-.9 0-1.5-.7-1.5-1.5 0-.8.6-1.5 1.5-1.5.8 0 1.5.7 1.5 1.5 0 .8-.7 1.5-1.5 1.5zm13.8 10.2h-2.8v-4.3c0-1-.4-1.7-1.4-1.7-.8 0-1.2.6-1.3 1.2-.1.2-.1.5-.1.7v4.1h-2.8v-8.8h2.8v1.2c.4-.6 1-1.2 2.3-1.2 1.7 0 3 1.1 3 3.5v5.3z"/></svg></a>
-      <a href="mailto:tanmoydas202231@gmail.com" aria-label="Email" class="hover:text-cyan-400"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M1.5 4.5C1.5 3.7 2.2 3 3 3h18c.8 0 1.5.7 1.5 1.5v15c0 .8-.7 1.5-1.5 1.5h-18c-.8 0-1.5-.7-1.5-1.5v-15zm16.7 1.3-6.2 6.2-6.2-6.2H3v.5l8.7 8.7c.4.4 1 .4 1.4 0l8.7-8.7v-.5h-2.2zm-12.7 13.7h14v-10.6l-7 7-7-7v10.6z"/></svg></a>
+      <a href="https://github.com/tammy3107" target="_blank" aria-label="GitHub" class="hover:text-cyan-400"><i data-lucide="github" class="w-6 h-6"></i></a>
+      <a href="https://www.linkedin.com/in/tanmoy-das-15926014a/" target="_blank" aria-label="LinkedIn" class="hover:text-cyan-400"><i data-lucide="linkedin" class="w-6 h-6"></i></a>
+      <a href="mailto:tanmoydas202231@gmail.com" aria-label="Email" class="hover:text-cyan-400"><i data-lucide="mail" class="w-6 h-6"></i></a>
     </div>
     <div class="text-gray-400 text-sm mt-2">Bonn, Germany | +49 1573 9675110</div>
   </header>
@@ -143,23 +153,17 @@
     </div>
   </section>
 
-  <!-- Skills -->
+  <!-- SKILLS with animated icons -->
   <section id="skills" class="fade-in container mx-auto max-w-xl mb-10 px-4 scroll-mt-20">
     <h2 class="text-2xl font-bold mb-2 text-cyan-400">Skills</h2>
-    <div class="bg-gray-900 rounded-2xl shadow-xl p-6 border border-gray-800">
-      <ul class="text-sm list-disc ml-4">
-        <li>Programming: Python, C++, LATEX</li>
-        <li>Techniques: RL, Deep Learning, ML, CV, Statistical Modeling, Software Dev, System Integration</li>
-        <li>Frameworks: PyTorch, JAX, OpenCV, Scikit-Learn, Docker, Git</li>
-        <li>Languages: English (Professional), Hindi (Native), German (Elementary)</li>
-      </ul>
+    <div id="skills-list" class="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-4">
+      <!-- Skill cards injected by JS -->
     </div>
   </section>
 
   <!-- Blog Section -->
   <section id="blog" class="fade-in container mx-auto max-w-xl mb-14 px-4 scroll-mt-20">
     <h2 class="text-2xl font-bold mb-4 text-cyan-400">Blog</h2>
-    <!-- Blog Post Example 1 -->
     <article id="blog1" class="bg-gray-900 rounded-2xl shadow-xl p-6 border border-gray-800 mb-7 scroll-mt-24">
       <h3 class="text-lg font-semibold mb-1">How I Built My Portfolio with HTML & Tailwind</h3>
       <div class="text-xs text-gray-400 mb-2">Published: 23 May 2025</div>
@@ -167,7 +171,6 @@
         In this blog post, I describe how I used pure HTML and TailwindCSS to quickly launch a modern portfolio on GitHub Pages—no frameworks or build tools required. I explain my design choices, sectioning, and tips for easy maintenance.
       </p>
     </article>
-    <!-- Blog Post Example 2 -->
     <article id="blog2" class="bg-gray-900 rounded-2xl shadow-xl p-6 border border-gray-800 mb-7 scroll-mt-24">
       <h3 class="text-lg font-semibold mb-1">Understanding Diffusion Models in AI</h3>
       <div class="text-xs text-gray-400 mb-2">Published: 10 May 2025</div>
@@ -175,7 +178,6 @@
         Diffusion models are at the forefront of generative AI research. Here, I break down the basic principles, how they differ from GANs, and share links to my project implementations and recommended reading.
       </p>
     </article>
-    <!-- Add more blog posts here: copy the <article> ... </article> block and add to the dropdown -->
     <div class="text-xs text-gray-500 text-right italic">Want more? Suggest a topic via <a href="mailto:tanmoydas202231@gmail.com" class="underline">email</a>!</div>
   </section>
 
@@ -195,6 +197,9 @@
       document.getElementById('year').textContent = new Date().getFullYear();
       revealOnScroll();
 
+      // Lucide icons for social links
+      lucide.createIcons();
+
       // Dropdown menu open/close on click
       const btn = document.getElementById('blogMenuBtn');
       const menu = btn.nextElementSibling;
@@ -203,12 +208,10 @@
         menu.classList.toggle('hidden');
         menu.classList.toggle('open');
       });
-      // Close dropdown on outside click
       document.body.addEventListener('click', function() {
         menu.classList.add('hidden');
         menu.classList.remove('open');
       });
-      // Prevent menu from closing when clicked inside
       menu.addEventListener('click', function(e) {
         e.stopPropagation();
       });
@@ -226,6 +229,56 @@
           }
         });
       });
+
+      // --------- Animated Skills Section ---------
+      const skills = [
+        { icon: "python",     label: "Python",           color: "#ffde57" },
+        { icon: "c-plus-plus",label: "C++",              color: "#00599C" },
+        { icon: "git-branch", label: "Git",              color: "#F1502F" },
+        { icon: "docker",     label: "Docker",           color: "#2496ED" },
+        { icon: "layers",     label: "PyTorch",          color: "#EE4C2C" },
+        { icon: "braces",     label: "JAX",              color: "#FFB13B" },
+        { icon: "camera",     label: "OpenCV",           color: "#5C3EE8" },
+        { icon: "function-square",label: "Scikit-Learn", color: "#F7931E" },
+        { icon: "brain-circuit", label: "Deep Learning", color: "#22D3EE" },
+        { icon: "network",    label: "Machine Learning", color: "#A855F7" },
+        { icon: "eye",        label: "Computer Vision",  color: "#8B5CF6" },
+        { icon: "rocket",     label: "Reinforcement Learning", color: "#60A5FA" },
+        { icon: "language",   label: "NLP",              color: "#A3E635" },
+        { icon: "file-type",  label: "LaTeX",            color: "#6366F1" },
+      ];
+      const container = document.getElementById('skills-list');
+      skills.forEach((skill, i) => {
+        const card = document.createElement('div');
+        card.className = "flex flex-col items-center bg-gray-800 rounded-2xl shadow p-4 hover:scale-105 transition-all duration-300 opacity-0 translate-y-5";
+        card.style.animation = `skill-pop 0.7s cubic-bezier(.33,1.53,.52,1) forwards`;
+        card.style.animationDelay = `${i * 120}ms`;
+
+        const iconDiv = document.createElement('div');
+        iconDiv.className = "mb-2";
+        iconDiv.innerHTML = `<i data-lucide="${skill.icon}" style="color: ${skill.color}; width:2.2rem;height:2.2rem;"></i>`;
+        card.appendChild(iconDiv);
+
+        const label = document.createElement('div');
+        label.className = "text-sm font-medium mt-1 text-gray-100";
+        label.textContent = skill.label;
+        card.appendChild(label);
+
+        container.appendChild(card);
+      });
+      lucide.createIcons();
+
+      // Animate in on scroll
+      function animateSkills() {
+        const section = document.getElementById('skills');
+        if (section.getBoundingClientRect().top < window.innerHeight - 60) {
+          Array.from(container.children).forEach(card => {
+            card.classList.add('animate-in');
+          });
+        }
+      }
+      window.addEventListener('scroll', animateSkills);
+      animateSkills();
     });
   </script>
 </body>
