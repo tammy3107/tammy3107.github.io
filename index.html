@@ -17,7 +17,6 @@
     .fade-in { opacity: 0; transform: translateY(30px); transition: all 1s cubic-bezier(.4,0,.2,1); }
     .fade-in.visible { opacity: 1; transform: translateY(0); }
     ::selection { background: #22d3ee44; }
-    /* Custom scrollbar */
     ::-webkit-scrollbar { width: 8px; background: #18181b; }
     ::-webkit-scrollbar-thumb { background: #22d3ee88; border-radius: 8px; }
     .dropdown:not(:hover):not(.open) .dropdown-menu { display: none; }
@@ -29,9 +28,24 @@
       opacity: 1 !important;
       transform: translateY(0) scale(1) !important;
     }
+    /* --- Slicky blobs background --- */
+    .blob-bg { position: fixed; inset: 0; z-index: -10; overflow: hidden; pointer-events: none;}
+    .blob-bg div { position: absolute; border-radius: 9999px; filter: blur(60px); }
+    .blob1 { width:400px; height:400px; background:#22d3ee; opacity:0.24; left:-100px; top:-100px; animation: blob1 16s ease-in-out infinite alternate;}
+    .blob2 { width:350px; height:350px; background:#6366f1; opacity:0.20; right:-80px; top:160px; animation: blob2 20s ease-in-out infinite alternate;}
+    .blob3 { width:320px; height:320px; background:#f472b6; opacity:0.19; left:40vw; top:65vh; animation: blob3 22s ease-in-out infinite alternate;}
+    @keyframes blob1 {0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(40px,60px) scale(1.13);}}
+    @keyframes blob2 {0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-30px,40px) scale(1.09);}}
+    @keyframes blob3 {0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(30px,-40px) scale(1.12);}}
   </style>
 </head>
 <body class="bg-gray-950 text-gray-100 font-sans">
+  <!-- Animated Slicky Blobs Background -->
+  <div class="blob-bg">
+    <div class="blob1"></div>
+    <div class="blob2"></div>
+    <div class="blob3"></div>
+  </div>
 
   <!-- NAVIGATION BAR -->
   <nav class="sticky top-0 z-50 bg-gray-950/80 backdrop-blur flex items-center justify-between px-6 py-3 border-b border-gray-800 mb-2">
