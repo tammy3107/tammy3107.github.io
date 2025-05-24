@@ -47,7 +47,7 @@
     <div class="blob2"></div>
     <div class="blob3"></div>
   </div>
-  <canvas id="codeRain" class="fixed inset-0 w-full h-full -z-10 pointer-events-none"></canvas>
+  <canvas id="ballsBg" class="fixed inset-0 w-full h-full -z-10 pointer-events-none"></canvas>
   <!-- NAVIGATION BAR -->
   <nav class="sticky top-0 z-50 bg-gray-950/80 backdrop-blur flex items-center justify-between px-6 py-3 border-b border-gray-800 mb-2">
     <div class="font-bold text-xl text-cyan-400 tracking-wide">Tanmoy Das</div>
@@ -394,6 +394,154 @@
     }
     resizeCanvas();
     draw();
+</script>
+<script>
+    // --- Programmer Ball-Eat-Game Background Animation ---
+    const canvas = document.getElementById('ballsBg');
+    const ctx = canvas.getContext('2d');
+    let width = window.innerWidth, height = window.innerHeight;
+    function resize() {
+    width = window.innerWidth; height = window.innerHeight;
+    canvas.width = width; canvas.height = height;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+    
+    const BALL_MIN = 18, BALL_MAX = 52, INIT_COUNT = 15;
+    const EAT_GROWTH = 0.45, SPLIT_RADIUS = 90, NEW_ON_SPLIT = 5, MIN_RADIUS = 18;
+    const COLORS = [
+    "rgba(34,211,238,0.28)",  // cyan
+    "rgba(99,102,241,0.19)",  // indigo
+    "rgba(244,114,182,0.18)", // pink
+    "rgba(16,185,129,0.20)",  // emerald
+    "rgba(253,186,116,0.16)", // amber
+    "rgba(244,63,94,0.13)"    // rose
+    ];
+    
+    function rand(a, b) { return a + Math.random() * (b-a); }
+    
+    class Ball {
+    constructor(x, y, r, vx, vy, color) {
+      this.x = x; this.y = y; this.r = r;
+      this.vx = vx; this.vy = vy;
+      this.color = color;
+      this.impact = 0; // animation value for impact
+    }
+    draw(ctx) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, 2*Math.PI);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = this.color;
+      ctx.shadowColor = this.color.replace(/[\d\.]+\)$/,"0.25)");
+      ctx.shadowBlur = this.impact > 0.01 ? 18 : 8;
+      ctx.globalAlpha = this.impact > 0.01 ? 0.56 : 0.38;
+      ctx.filter = this.impact > 0.01 ? "blur(0.7px)" : "blur(0.3px)";
+      ctx.fill();
+      ctx.restore();
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      // bounce off walls (subtle)
+      if (this.x - this.r < 0 && this.vx < 0) { this.x = this.r; this.vx *= -1; }
+      if (this.x + this.r > width && this.vx > 0) { this.x = width - this.r; this.vx *= -1; }
+      if (this.y - this.r < 0 && this.vy < 0) { this.y = this.r; this.vy *= -1; }
+      if (this.y + this.r > height && this.vy > 0) { this.y = height - this.r; this.vy *= -1; }
+      // fade out impact
+      this.impact *= 0.91;
+    }
+    }
+    let balls = [];
+    function makeBall(radius) {
+    // Avoid overlapping too closely
+    for (let tries=0; tries<40; tries++) {
+      let r = radius || rand(BALL_MIN, BALL_MAX);
+      let x = rand(r, width-r), y = rand(r, height-r);
+      let ok = balls.every(b => Math.hypot(b.x-x, b.y-y) > b.r+r+8);
+      if (!ok) continue;
+      let speed = rand(0.5, 1.7)*(1-Math.min(r/SPLIT_RADIUS,0.85));
+      let angle = rand(0,2*Math.PI);
+      let vx = Math.cos(angle)*speed, vy = Math.sin(angle)*speed;
+      let color = COLORS[Math.floor(rand(0,COLORS.length))];
+      return new Ball(x, y, r, vx, vy, color);
+    }
+    // fallback if crowded
+    return new Ball(rand(BALL_MIN, width-BALL_MIN), rand(BALL_MIN, height-BALL_MIN), radius||rand(BALL_MIN,BALL_MAX), rand(-1,1), rand(-1,1), COLORS[Math.floor(rand(0,COLORS.length))]);
+    }
+    function splitBall(bigBall) {
+    const result = [];
+    let newRad = Math.max(MIN_RADIUS, Math.floor(bigBall.r/Math.sqrt(NEW_ON_SPLIT)));
+    for (let i=0; i<NEW_ON_SPLIT; i++) {
+      let angle = (2*Math.PI*i/NEW_ON_SPLIT) + rand(-0.2,0.2);
+      let vx = Math.cos(angle)*rand(0.7,1.5), vy = Math.sin(angle)*rand(0.7,1.5);
+      let b = new Ball(
+        bigBall.x + Math.cos(angle)*(newRad+3),
+        bigBall.y + Math.sin(angle)*(newRad+3),
+        newRad, vx, vy, COLORS[Math.floor(rand(0,COLORS.length))]
+      );
+      result.push(b);
+    }
+    return result;
+    }
+    // Init balls
+    function resetBalls() {
+    balls = [];
+    for (let i=0; i<INIT_COUNT; i++) balls.push(makeBall());
+    }
+    resetBalls();
+    window.addEventListener('resize', resetBalls);
+    
+    // --- Animation Loop ---
+    function animate() {
+    // Modern background gradient behind balls (very subtle)
+    let grad = ctx.createLinearGradient(0, 0, width, height);
+    grad.addColorStop(0, "#101927");
+    grad.addColorStop(0.9, "#16202a");
+    grad.addColorStop(1, "#18181b");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0,0,width,height);
+    
+    // Draw, move, collide balls
+    for (const ball of balls) ball.update();
+    
+    // Ball "eating" logic
+    for (let i=0; i<balls.length; i++) {
+      for (let j=i+1; j<balls.length; j++) {
+        let a = balls[i], b = balls[j];
+        let dx = a.x - b.x, dy = a.y - b.y;
+        let dist = Math.hypot(dx, dy);
+        if (dist < a.r + b.r && Math.abs(a.r-b.r) > 1.1) {
+          let big, small;
+          if (a.r > b.r) { big=a; small=b; } else { big=b; small=a; }
+          // Eat! Subtle scale effect:
+          big.impact = Math.max(big.impact, 0.18 + (small.r/big.r)*0.25);
+          // Grow radius (not linear for smoothness)
+          big.r = Math.min(SPLIT_RADIUS+8, Math.sqrt(big.r*big.r + small.r*small.r) + EAT_GROWTH);
+          // Remove the small ball, make a pop
+          balls.splice(balls.indexOf(small),1);
+          // Optionally break loop (prevents double eat in same frame)
+          break;
+        }
+      }
+    }
+    // Split oversized balls
+    for (let i=balls.length-1; i>=0; i--) {
+      if (balls[i].r > SPLIT_RADIUS) {
+        let news = splitBall(balls[i]);
+        balls.splice(i,1);
+        balls.push(...news);
+      }
+    }
+    // Keep at least INIT_COUNT balls
+    while (balls.length < INIT_COUNT) balls.push(makeBall());
+    
+    // Draw all balls
+    for (const ball of balls) ball.draw(ctx);
+    
+    requestAnimationFrame(animate);
+    }
+    animate();
 </script>
 
 
