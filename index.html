@@ -39,6 +39,7 @@
     @keyframes blob3 {0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(30px,-40px) scale(1.12);}}
   </style>
 </head>
+
 <body class="bg-gray-950 text-gray-100 font-sans">
   <!-- Animated Slicky Blobs Background -->
   <div class="blob-bg">
@@ -46,7 +47,7 @@
     <div class="blob2"></div>
     <div class="blob3"></div>
   </div>
-
+  <canvas id="codeRain" class="fixed inset-0 w-full h-full -z-10 pointer-events-none"></canvas>
   <!-- NAVIGATION BAR -->
   <nav class="sticky top-0 z-50 bg-gray-950/80 backdrop-blur flex items-center justify-between px-6 py-3 border-b border-gray-800 mb-2">
     <div class="font-bold text-xl text-cyan-400 tracking-wide">Tanmoy Das</div>
@@ -349,5 +350,44 @@
       animateSkills();
     });
   </script>
+  <script>
+    // Responsive code rain adapted to bg
+    const canvas = document.getElementById('codeRain');
+    const ctx = canvas.getContext('2d');
+    let width, height, columns, drops, fontSize;
+    const codeChars = "01<>{}[]();=+-*/&|^%$#@!";
+    
+    function resizeCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      fontSize = Math.max(14, Math.min(24, width / 80));
+      columns = Math.floor(width / fontSize);
+      drops = Array(columns).fill(1);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    
+    function draw() {
+      ctx.fillStyle = "rgba(24, 24, 27, 0.18)"; // very light overlay to fade previous frame
+      ctx.fillRect(0, 0, width, height);
+    
+      ctx.font = fontSize + "px 'Fira Mono', 'Consolas', monospace";
+      ctx.fillStyle = "#22d3eeCC"; // cyan, semi-bright, matches your accent
+    
+      for (let i = 0; i < columns; i++) {
+        const char = codeChars[Math.floor(Math.random() * codeChars.length)];
+        ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+    
+        // randomize drop reset (creates the "rain" effect)
+        if (drops[i] * fontSize > height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      }
+      requestAnimationFrame(draw);
+    }
+    resizeCanvas();
+    draw();
+</script>
+
 </body>
 </html>
