@@ -351,11 +351,14 @@
     });
   </script>
   <script>
-    // Responsive code rain adapted to bg
+    // Slower and smooth code rain background
     const canvas = document.getElementById('codeRain');
     const ctx = canvas.getContext('2d');
-    let width, height, columns, drops, fontSize;
+    let width, height, columns, drops, fontSize, lastDraw = 0;
     const codeChars = "01<>{}[]();=+-*/&|^%$#@!";
+    
+    // Slower speed: smaller = slower (e.g. 0.7 is slow, 1.0 is default, 1.5 is fast)
+    const RAIN_SPEED = 0.6;  
     
     function resizeCanvas() {
       width = window.innerWidth;
@@ -364,30 +367,35 @@
       canvas.height = height;
       fontSize = Math.max(14, Math.min(24, width / 80));
       columns = Math.floor(width / fontSize);
-      drops = Array(columns).fill(1);
+      // Use float for smooth slow fall
+      drops = Array(columns).fill(1 + Math.random() * 10);
     }
     window.addEventListener('resize', resizeCanvas);
     
-    function draw() {
-      ctx.fillStyle = "rgba(24, 24, 27, 0.18)"; // very light overlay to fade previous frame
+    function draw(now = 0) {
+      // Throttle frame rate for extra smoothness (about 40 FPS)
+      if (now - lastDraw < 25) { requestAnimationFrame(draw); return; }
+      lastDraw = now;
+      ctx.fillStyle = "rgba(24,24,27,0.18)";
       ctx.fillRect(0, 0, width, height);
     
       ctx.font = fontSize + "px 'Fira Mono', 'Consolas', monospace";
-      ctx.fillStyle = "#22d3eeCC"; // cyan, semi-bright, matches your accent
+      ctx.fillStyle = "#22d3eeCC";
     
       for (let i = 0; i < columns; i++) {
         const char = codeChars[Math.floor(Math.random() * codeChars.length)];
         ctx.fillText(char, i * fontSize, drops[i] * fontSize);
     
-        // randomize drop reset (creates the "rain" effect)
+        // Drops increment slower
         if (drops[i] * fontSize > height && Math.random() > 0.975) drops[i] = 0;
-        drops[i]++;
+        drops[i] += RAIN_SPEED;
       }
       requestAnimationFrame(draw);
     }
     resizeCanvas();
     draw();
 </script>
+
 
 </body>
 </html>
