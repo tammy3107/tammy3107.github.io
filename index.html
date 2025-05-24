@@ -48,7 +48,7 @@
     <div class="blob3"></div>
   </div>
   <!-- Background ASCII Canvas -->
-<canvas id="asciiBg" class="fixed inset-0 w-full h-full -z-20"></canvas>
+<canvas id="codeRain" class="fixed inset-0 w-full h-full -z-10 pointer-events-none"></canvas>
 <!-- Transparent overlay for click detection -->
 <div id="asciiBgClick" class="fixed inset-0 w-full h-full -z-10" style="background:transparent;cursor:pointer"></div>
   <!-- NAVIGATION BAR -->
@@ -354,84 +354,49 @@
     });
   </script>
 <script>
-    // ASCII Background Animation JS (same as before)
-  const canvas = document.getElementById('asciiBg');
-  const ctx = canvas.getContext('2d');
-  let width = window.innerWidth, height = window.innerHeight;
-  function resize() {
-    width = window.innerWidth; height = window.innerHeight;
-    canvas.width = width; canvas.height = height;
+// Slower and smooth code rain background
+const canvas = document.getElementById('codeRain');
+const ctx = canvas.getContext('2d');
+let width, height, columns, drops, fontSize, lastDraw = 0;
+const codeChars = "01<>{}[]();=+-*/&|^%$#@!";
+
+// Slower speed: smaller = slower (e.g. 0.7 is slow, 1.0 is default, 1.5 is fast)
+const RAIN_SPEED = 0.6;  
+
+function resizeCanvas() {
+  width = window.innerWidth;
+  height = window.innerHeight;
+  canvas.width = width;
+  canvas.height = height;
+  fontSize = Math.max(14, Math.min(24, width / 80));
+  columns = Math.floor(width / fontSize);
+  // Use float for smooth slow fall
+  drops = Array(columns).fill(1 + Math.random() * 10);
+}
+window.addEventListener('resize', resizeCanvas);
+
+function draw(now = 0) {
+  // Throttle frame rate for extra smoothness (about 40 FPS)
+  if (now - lastDraw < 25) { requestAnimationFrame(draw); return; }
+  lastDraw = now;
+  ctx.fillStyle = "rgba(24,24,27,0.18)";
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.font = fontSize + "px 'Fira Mono', 'Consolas', monospace";
+  ctx.fillStyle = "#22d3eeCC";
+
+  for (let i = 0; i < columns; i++) {
+    const char = codeChars[Math.floor(Math.random() * codeChars.length)];
+    ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+
+    // Drops increment slower
+    if (drops[i] * fontSize > height && Math.random() > 0.975) drops[i] = 0;
+    drops[i] += RAIN_SPEED;
   }
-  window.addEventListener('resize', resize);
-  resize();
-  
-  let animIndex = 0;
-  const animCount = 3;
-  let rainCols, rainDrops, fontSize1 = 20, rainChars = "01<>{}[]();=+-*/&|";
-  function resetRain() {
-    fontSize1 = Math.max(18, Math.min(28, width/70));
-    rainCols = Math.floor(width/fontSize1);
-    rainDrops = Array(rainCols).fill(1+Math.random()*10);
-  }
-  function drawCodeRain(dt) {
-    ctx.fillStyle = "rgba(24,24,27,0.16)";
-    ctx.fillRect(0,0,width,height);
-    ctx.font = fontSize1 + "px 'Fira Mono', 'Consolas', monospace";
-    ctx.fillStyle = "#22d3eeCC";
-    for (let i = 0; i < rainCols; i++) {
-      const char = rainChars[Math.floor(Math.random()*rainChars.length)];
-      ctx.fillText(char, i*fontSize1, rainDrops[i]*fontSize1);
-      if (rainDrops[i]*fontSize1 > height && Math.random() > 0.977) rainDrops[i]=0;
-      rainDrops[i] += 0.44;
-    }
-  }
-  const chars2 = "~=-_/\\";
-  const lineCount2 = 14, charSize2 = 28;
-  function drawAsciiWaves(dt) {
-    ctx.clearRect(0,0,width,height);
-    ctx.font = `bold ${charSize2}px 'Fira Mono', 'Consolas', monospace`;
-    ctx.globalAlpha = 0.17;
-    for(let l=0; l<lineCount2; l++) {
-      const phase = dt/1700 + l*0.7;
-      for(let i=0; i<Math.floor(width/charSize2); i++) {
-        let y = Math.floor(height/(lineCount2+1)*(l+1) + Math.sin(phase + i/3)*16);
-        let char = chars2[Math.floor((Math.sin(phase + i/2)*2 + 3)%chars2.length)];
-        ctx.fillStyle = (l%2==0) ? "#22d3ee" : "#6366f1";
-        ctx.fillText(char, i*charSize2, y);
-      }
-    }
-    ctx.globalAlpha = 1;
-  }
-  const chars3 = "{}[]<>()|*+/#$%01";
-  const gridCell = 32;
-  function drawAsciiGrid(dt) {
-    ctx.clearRect(0,0,width,height);
-    ctx.font = `bold ${gridCell-3}px 'Fira Mono', 'Consolas', monospace`;
-    for(let x=0; x<width; x+=gridCell) {
-      for(let y=0; y<height; y+=gridCell) {
-        let idx = Math.floor(Math.abs(Math.sin(x*0.01+y*0.02 + dt/1300))*chars3.length) % chars3.length;
-        let char = chars3[idx];
-        ctx.globalAlpha = 0.10 + 0.14*Math.abs(Math.sin(x*0.003+y*0.006+dt/1600));
-        ctx.fillStyle = "#e2e8f0";
-        ctx.fillText(char, x, y+gridCell);
-      }
-    }
-    ctx.globalAlpha = 1;
-  }
-  function animateAsciiBg(ts) {
-    if (width !== window.innerWidth || height !== window.innerHeight) resize();
-    if (animIndex === 0) drawCodeRain(ts);
-    else if (animIndex === 1) drawAsciiWaves(ts);
-    else if (animIndex === 2) drawAsciiGrid(ts);
-    requestAnimationFrame(animateAsciiBg);
-  }
-  // Attach click to overlay
-  document.getElementById('asciiBgClick').addEventListener('click', function() {
-    animIndex = (animIndex+1)%animCount;
-    if (animIndex===0) resetRain();
-  });
-  window.addEventListener('DOMContentLoaded', resetRain);
-  animateAsciiBg(0);
+  requestAnimationFrame(draw);
+}
+resizeCanvas();
+draw();
 </script>
 
 
