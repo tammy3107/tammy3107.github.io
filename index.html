@@ -352,97 +352,81 @@
     });
   </script>
 <script>
-    // ========== ASCII Background Animation ==========
-    
     const canvas = document.getElementById('asciiBg');
     const ctx = canvas.getContext('2d');
     let width = window.innerWidth, height = window.innerHeight;
     function resize() {
-    width = window.innerWidth; height = window.innerHeight;
-    canvas.width = width; canvas.height = height;
+      width = window.innerWidth; height = window.innerHeight;
+      canvas.width = width; canvas.height = height;
     }
     window.addEventListener('resize', resize);
     resize();
     
-    // --- Animation state ---
-    let animIndex = 0; // current effect (0: code rain, 1: waves, 2: random grid)
-    const animCount = 3; // total effects
-    let lastTime = 0;
-    
-    // ========== 1. Code Rain Effect ==========
+    let animIndex = 0;
+    const animCount = 3;
     let rainCols, rainDrops, fontSize1 = 20, rainChars = "01<>{}[]();=+-*/&|";
     function resetRain() {
-    fontSize1 = Math.max(18, Math.min(28, width/70));
-    rainCols = Math.floor(width/fontSize1);
-    rainDrops = Array(rainCols).fill(1+Math.random()*10);
+      fontSize1 = Math.max(18, Math.min(28, width/70));
+      rainCols = Math.floor(width/fontSize1);
+      rainDrops = Array(rainCols).fill(1+Math.random()*10);
     }
     function drawCodeRain(dt) {
-    ctx.fillStyle = "rgba(24,24,27,0.16)";
-    ctx.fillRect(0,0,width,height);
-    ctx.font = fontSize1 + "px 'Fira Mono', 'Consolas', monospace";
-    ctx.fillStyle = "#22d3eeCC";
-    for (let i = 0; i < rainCols; i++) {
-      const char = rainChars[Math.floor(Math.random()*rainChars.length)];
-      ctx.fillText(char, i*fontSize1, rainDrops[i]*fontSize1);
-      if (rainDrops[i]*fontSize1 > height && Math.random() > 0.977) rainDrops[i]=0;
-      rainDrops[i] += 0.44; // slow speed
+      ctx.fillStyle = "rgba(24,24,27,0.16)";
+      ctx.fillRect(0,0,width,height);
+      ctx.font = fontSize1 + "px 'Fira Mono', 'Consolas', monospace";
+      ctx.fillStyle = "#22d3eeCC";
+      for (let i = 0; i < rainCols; i++) {
+        const char = rainChars[Math.floor(Math.random()*rainChars.length)];
+        ctx.fillText(char, i*fontSize1, rainDrops[i]*fontSize1);
+        if (rainDrops[i]*fontSize1 > height && Math.random() > 0.977) rainDrops[i]=0;
+        rainDrops[i] += 0.44;
+      }
     }
-    }
-    
-    // ========== 2. ASCII Waves Effect ==========
     const chars2 = "~=-_/\\";
     const lineCount2 = 14, charSize2 = 28;
     function drawAsciiWaves(dt) {
-    ctx.clearRect(0,0,width,height);
-    ctx.font = `bold ${charSize2}px 'Fira Mono', 'Consolas', monospace`;
-    ctx.globalAlpha = 0.17;
-    for(let l=0; l<lineCount2; l++) {
-      const phase = dt/1700 + l*0.7;
-      for(let i=0; i<Math.floor(width/charSize2); i++) {
-        let y = Math.floor(height/(lineCount2+1)*(l+1) + Math.sin(phase + i/3)*16);
-        let char = chars2[Math.floor((Math.sin(phase + i/2)*2 + 3)%chars2.length)];
-        ctx.fillStyle = (l%2==0) ? "#22d3ee" : "#6366f1";
-        ctx.fillText(char, i*charSize2, y);
+      ctx.clearRect(0,0,width,height);
+      ctx.font = `bold ${charSize2}px 'Fira Mono', 'Consolas', monospace`;
+      ctx.globalAlpha = 0.17;
+      for(let l=0; l<lineCount2; l++) {
+        const phase = dt/1700 + l*0.7;
+        for(let i=0; i<Math.floor(width/charSize2); i++) {
+          let y = Math.floor(height/(lineCount2+1)*(l+1) + Math.sin(phase + i/3)*16);
+          let char = chars2[Math.floor((Math.sin(phase + i/2)*2 + 3)%chars2.length)];
+          ctx.fillStyle = (l%2==0) ? "#22d3ee" : "#6366f1";
+          ctx.fillText(char, i*charSize2, y);
+        }
       }
+      ctx.globalAlpha = 1;
     }
-    ctx.globalAlpha = 1;
-    }
-    
-    // ========== 3. Random ASCII Grid Flicker ==========
     const chars3 = "{}[]<>()|*+/#$%01";
     const gridCell = 32;
     function drawAsciiGrid(dt) {
-    ctx.clearRect(0,0,width,height);
-    ctx.font = `bold ${gridCell-3}px 'Fira Mono', 'Consolas', monospace`;
-    for(let x=0; x<width; x+=gridCell) {
-      for(let y=0; y<height; y+=gridCell) {
-        let idx = Math.floor(Math.abs(Math.sin(x*0.01+y*0.02 + dt/1300))*chars3.length) % chars3.length;
-        let char = chars3[idx];
-        ctx.globalAlpha = 0.10 + 0.14*Math.abs(Math.sin(x*0.003+y*0.006+dt/1600));
-        ctx.fillStyle = "#e2e8f0";
-        ctx.fillText(char, x, y+gridCell);
+      ctx.clearRect(0,0,width,height);
+      ctx.font = `bold ${gridCell-3}px 'Fira Mono', 'Consolas', monospace`;
+      for(let x=0; x<width; x+=gridCell) {
+        for(let y=0; y<height; y+=gridCell) {
+          let idx = Math.floor(Math.abs(Math.sin(x*0.01+y*0.02 + dt/1300))*chars3.length) % chars3.length;
+          let char = chars3[idx];
+          ctx.globalAlpha = 0.10 + 0.14*Math.abs(Math.sin(x*0.003+y*0.006+dt/1600));
+          ctx.fillStyle = "#e2e8f0";
+          ctx.fillText(char, x, y+gridCell);
+        }
       }
+      ctx.globalAlpha = 1;
     }
-    ctx.globalAlpha = 1;
-    }
-    
-    // ========== Animation Loop & Switch Logic ==========
     function animateAsciiBg(ts) {
-    if (width !== window.innerWidth || height !== window.innerHeight) resize();
-    if (animIndex === 0) drawCodeRain(ts);
-    else if (animIndex === 1) drawAsciiWaves(ts);
-    else if (animIndex === 2) drawAsciiGrid(ts);
-    requestAnimationFrame(animateAsciiBg);
+      if (width !== window.innerWidth || height !== window.innerHeight) resize();
+      if (animIndex === 0) drawCodeRain(ts);
+      else if (animIndex === 1) drawAsciiWaves(ts);
+      else if (animIndex === 2) drawAsciiGrid(ts);
+      requestAnimationFrame(animateAsciiBg);
     }
-    
-    // --- Switch animation on background click ---
     canvas.addEventListener('click', function() {
-    animIndex = (animIndex+1)%animCount;
-    if (animIndex===0) resetRain();
+      animIndex = (animIndex+1)%animCount;
+      if (animIndex===0) resetRain();
     });
     window.addEventListener('DOMContentLoaded', resetRain);
-    
-    // Always start animation
     animateAsciiBg(0);
 </script>
 
