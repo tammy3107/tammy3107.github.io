@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tanmoy Das | Portfolio</title>
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+      onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});">
+  </script>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons CDN -->
@@ -276,7 +282,7 @@
     </article>
     <article id="blog2" class="bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-800 mb-9 scroll-mt-24">
       <h3 class="text-lg font-semibold mb-1">Understanding Diffusion Models (An Extensive Guide)</h3>
-      <div class="text-xs text-gray-400 mb-2">Published: 3 June 2025</div>
+      <div class="text-xs text-gray-400 mb-2">Published: 8 June 2025</div>
       <p class="text-sm text-gray-200 mb-2">
         <b>Diffusion models</b> have quickly become the state-of-the-art for generative modeling, powering much of the excitement around AI art, text-to-image synthesis, and even scientific data simulation. If you’re curious about how these models work (and how they differ from earlier techniques like GANs), this post is for you!
       </p>
@@ -286,10 +292,10 @@
       </p>
       <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
         <li>
-          The **forward process**: Start with real data and add small amounts of random noise in many steps, until the data becomes pure noise.
+          The <b>forward process</b>: Start with real data and add small amounts of random noise in many steps, until the data becomes pure noise.
         </li>
         <li>
-          The **reverse process**: Train a neural network to predict and remove this noise, gradually reconstructing data from noise.
+          The <b>reverse process</b>: Train a neural network to predict and remove this noise, gradually reconstructing data from noise.
         </li>
         <li>
           This process is mathematically inspired by ideas from non-equilibrium thermodynamics and Markov chains.
@@ -311,16 +317,13 @@
       </p>
       <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
         <li>
-          <b>Forward diffusion:</b> \( x_t = \sqrt{\alpha_t} x_0 + \sqrt{1 - \alpha_t} \epsilon \), where \( x_0 \) is real data, \( \epsilon \) is Gaussian noise, and \( \alpha_t \) controls noise schedule.
+          <b>Forward diffusion:</b> <span>$$x_t = \sqrt{\alpha_t} x_0 + \sqrt{1 - \alpha_t} \, \epsilon$$</span>, where <b>\(x_0\)</b> is real data, <b>\(\epsilon\)</b> is Gaussian noise, and <b>\(\alpha_t\)</b> controls noise schedule.
         </li>
         <li>
-          <b>Reverse denoising:</b> The model predicts \( \epsilon \) (or \( x_0 \)), using a neural network at each timestep \( t \).
+          <b>Reverse denoising:</b> The model predicts <b>\(\epsilon\)</b> (or <b>\(x_0\)</b>), using a neural network at each timestep <b>\(t\)</b>.
         </li>
       </ul>
       <h4 class="font-semibold text-cyan-400 mt-4 mb-1">Applications</h4>
-      <p class="text-sm text-gray-200 mb-2">
-        Diffusion models power some of today’s most advanced AI:
-      </p>
       <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
         <li>
           <b>Image generation:</b> Stable Diffusion, DALL·E 2, Imagen.
@@ -338,8 +341,8 @@
       <h4 class="font-semibold text-cyan-400 mt-4 mb-1">Recent Trends & Tips for Researchers</h4>
       <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
         <li>Look for improvements in <b>sampling speed</b> (e.g., DDIM, DPM-Solver, and others).</li>
-        <li>Architecture choices matter: UNet-like structures are very popular for diffusion models in vision.</li>
-        <li>Pay attention to the noise schedule—different choices affect output diversity and quality.</li>
+        <li>Architecture choices matter: <b>UNet-like</b> structures are very popular for diffusion models in vision.</li>
+        <li>Pay attention to the <b>noise schedule</b>—different choices affect output diversity and quality.</li>
         <li>Combining diffusion models with other AI techniques (transformers, GANs, autoencoders) is a hot area.</li>
       </ul>
       <h4 class="font-semibold text-cyan-400 mt-4 mb-1">Further Reading</h4>
@@ -361,7 +364,8 @@
         Have more questions, or want to see my own diffusion model projects?  
         <a href="mailto:tanmoydas202231@gmail.com" class="underline hover:text-cyan-400">Drop me an email!</a>
       </p>
-  </article>
+    </article>
+
 
 
   <footer class="text-center p-7 text-xs text-gray-500">
