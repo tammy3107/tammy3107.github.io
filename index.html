@@ -237,21 +237,132 @@
       <h2 class="text-2xl font-bold text-cyan-400">Blog</h2>
     </div>
     <article id="blog1" class="bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-800 mb-9 scroll-mt-24">
-      <h3 class="text-lg font-semibold mb-1">How I Built My Portfolio with HTML & Tailwind</h3>
-      <div class="text-xs text-gray-400 mb-2">Published: 23 May 2025</div>
+      <h3 class="text-lg font-semibold mb-1">How I Built This Portfolio Website</h3>
+      <div class="text-xs text-gray-400 mb-2">Published: 29 May 2025</div>
       <p class="text-sm text-gray-200 mb-2">
-        In this blog post, I describe how I used pure HTML and TailwindCSS to quickly launch a modern portfolio on GitHub Pages—no frameworks or build tools required. I explain my design choices, sectioning, and tips for easy maintenance.
+        Building this portfolio website was a fun blend of design, programming, and a little bit of game logic! My goal was to create a modern, interactive, and professional online presence that showcases not only my work, but my personality as a coder.
+      </p>
+      <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
+        <li>
+          <b>Framework-free, super fast:</b> I wrote the site using just HTML5, Tailwind CSS (for rapid modern styling), and a few lines of JavaScript—no React, no heavy build tools, so everything loads fast.
+        </li>
+        <li>
+          <b>Modern layout:</b> I used a single-column layout with clear cards for each section. The profile picture, project and education/experience cards, and blog section are all mobile-friendly and fully responsive.
+        </li>
+        <li>
+          <b>Animated skills:</b> Each of my technical skills is shown as an icon that pops in with animation—this is done using Lucide icons and JavaScript for a bit of “wow” effect.
+        </li>
+        <li>
+          <b>ASCII background effects:</b> The animated background is pure HTML5 canvas—featuring multiple ASCII art effects (like code rain and waves), and you can switch between them by clicking the background. This is all custom-coded to match the coder vibe!
+        </li>
+        <li>
+          <b>Dynamic blog:</b> My blog section is fully integrated, and the dropdown menu at the top smoothly scrolls you to any post. Adding a new blog entry is as easy as pasting in a new block of HTML.
+        </li>
+        <li>
+          <b>Open source and easy to expand:</b> The whole site is hosted on GitHub Pages. If I want to add new features, projects, or sections, I can just update the code and push—no deployment hassles.
+        </li>
+      </ul>
+      <p class="text-sm text-gray-200 mb-2">
+        <b>Key tech stack:</b>  
+        Tailwind CSS, Lucide Icons, HTML5 Canvas (for backgrounds), and a sprinkle of vanilla JavaScript for the animated effects and navigation.
+      </p>
+      <p class="text-sm text-gray-200 mb-2">
+        <b>Why code this from scratch?</b><br>
+        I wanted full creative control and to demonstrate my programming and design skills directly in my own website, rather than relying on templates. It was also a great exercise in rapid prototyping and UI/UX thinking!
+      </p>
+      <p class="text-sm text-gray-200">
+        If you have questions about how I built any part of this site, or want tips for building your own, feel free to reach out!
       </p>
     </article>
     <article id="blog2" class="bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-800 mb-9 scroll-mt-24">
-      <h3 class="text-lg font-semibold mb-1">Understanding Diffusion Models in AI</h3>
-      <div class="text-xs text-gray-400 mb-2">Published: 10 May 2025</div>
+      <h3 class="text-lg font-semibold mb-1">Understanding Diffusion Models (An Extensive Guide)</h3>
+      <div class="text-xs text-gray-400 mb-2">Published: 3 June 2025</div>
       <p class="text-sm text-gray-200 mb-2">
-        Diffusion models are at the forefront of generative AI research. Here, I break down the basic principles, how they differ from GANs, and share links to my project implementations and recommended reading.
+        <b>Diffusion models</b> have quickly become the state-of-the-art for generative modeling, powering much of the excitement around AI art, text-to-image synthesis, and even scientific data simulation. If you’re curious about how these models work (and how they differ from earlier techniques like GANs), this post is for you!
       </p>
-    </article>
-    <div class="text-xs text-gray-500 text-right italic">Want more? Suggest a topic via <a href="mailto:tanmoydas202231@gmail.com" class="underline">email</a>!</div>
-  </section>
+      <h4 class="font-semibold text-cyan-400 mt-4 mb-1">What Are Diffusion Models?</h4>
+      <p class="text-sm text-gray-200 mb-2">
+        At a high level, a diffusion model is a generative model that learns to reverse a gradual noising process. The model is trained to transform random noise into realistic samples (images, audio, etc.), step by step, by learning how to “denoise” at each stage.
+      </p>
+      <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
+        <li>
+          The **forward process**: Start with real data and add small amounts of random noise in many steps, until the data becomes pure noise.
+        </li>
+        <li>
+          The **reverse process**: Train a neural network to predict and remove this noise, gradually reconstructing data from noise.
+        </li>
+        <li>
+          This process is mathematically inspired by ideas from non-equilibrium thermodynamics and Markov chains.
+        </li>
+      </ul>
+      <h4 class="font-semibold text-cyan-400 mt-4 mb-1">How Do They Compare to GANs?</h4>
+      <p class="text-sm text-gray-200 mb-2">
+        GANs (Generative Adversarial Networks) pit two networks against each other: a generator and a discriminator. They’re powerful, but can be unstable and prone to mode collapse (generating limited diversity). Diffusion models, on the other hand:
+      </p>
+      <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
+        <li>Are more stable to train—no adversarial “game.”</li>
+        <li>Allow for more control over the sampling process (e.g., conditional image generation).</li>
+        <li>Often produce crisper, more detailed outputs, especially in high-res scenarios.</li>
+        <li>Can be slower at inference (though new sampling techniques are closing this gap).</li>
+      </ul>
+      <h4 class="font-semibold text-cyan-400 mt-4 mb-1">The Core Mathematics (Briefly)</h4>
+      <p class="text-sm text-gray-200 mb-2">
+        The model learns to approximate the probability distribution of the data via a sequence of conditional distributions. During training, noise is gradually added to data; at each timestep, the model predicts either the clean data or the noise, given the current noisy sample.
+      </p>
+      <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
+        <li>
+          <b>Forward diffusion:</b> \( x_t = \sqrt{\alpha_t} x_0 + \sqrt{1 - \alpha_t} \epsilon \), where \( x_0 \) is real data, \( \epsilon \) is Gaussian noise, and \( \alpha_t \) controls noise schedule.
+        </li>
+        <li>
+          <b>Reverse denoising:</b> The model predicts \( \epsilon \) (or \( x_0 \)), using a neural network at each timestep \( t \).
+        </li>
+      </ul>
+      <h4 class="font-semibold text-cyan-400 mt-4 mb-1">Applications</h4>
+      <p class="text-sm text-gray-200 mb-2">
+        Diffusion models power some of today’s most advanced AI:
+      </p>
+      <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
+        <li>
+          <b>Image generation:</b> Stable Diffusion, DALL·E 2, Imagen.
+        </li>
+        <li>
+          <b>Audio synthesis:</b> Speech and music generation (e.g., DiffWave).
+        </li>
+        <li>
+          <b>Data simulation:</b> Simulating scientific or physical data, 3D molecules, medical images, etc.
+        </li>
+        <li>
+          <b>Conditional/controlled generation:</b> Generate images from text, sketches, or other signals.
+        </li>
+      </ul>
+      <h4 class="font-semibold text-cyan-400 mt-4 mb-1">Recent Trends & Tips for Researchers</h4>
+      <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
+        <li>Look for improvements in <b>sampling speed</b> (e.g., DDIM, DPM-Solver, and others).</li>
+        <li>Architecture choices matter: UNet-like structures are very popular for diffusion models in vision.</li>
+        <li>Pay attention to the noise schedule—different choices affect output diversity and quality.</li>
+        <li>Combining diffusion models with other AI techniques (transformers, GANs, autoencoders) is a hot area.</li>
+      </ul>
+      <h4 class="font-semibold text-cyan-400 mt-4 mb-1">Further Reading</h4>
+      <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
+        <li>
+          <a href="https://arxiv.org/abs/2006.11239" target="_blank" class="underline hover:text-cyan-400">Denoising Diffusion Probabilistic Models (DDPM)</a> — the foundational paper
+        </li>
+        <li>
+          <a href="https://stability.ai/blog/stable-diffusion-announcement" target="_blank" class="underline hover:text-cyan-400">Stable Diffusion: How it works</a>
+        </li>
+        <li>
+          <a href="https://lilianweng.github.io/posts/2021-07-11-diffusion-models/" target="_blank" class="underline hover:text-cyan-400">Lilian Weng’s blog: Diffusion Models</a>
+        </li>
+        <li>
+          <a href="https://github.com/huggingface/diffusers" target="_blank" class="underline hover:text-cyan-400">Hugging Face Diffusers Library</a>
+        </li>
+      </ul>
+      <p class="text-sm text-gray-200">
+        Have more questions, or want to see my own diffusion model projects?  
+        <a href="mailto:tanmoydas202231@gmail.com" class="underline hover:text-cyan-400">Drop me an email!</a>
+      </p>
+  </article>
+
 
   <footer class="text-center p-7 text-xs text-gray-500">
     &copy; <span id="year"></span> Tanmoy Das &mdash; Portfolio. <a href="mailto:tanmoydas202231@gmail.com" class="underline hover:text-cyan-400">Contact</a>
