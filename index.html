@@ -365,6 +365,114 @@
         <a href="mailto:tanmoydas202231@gmail.com" class="underline hover:text-cyan-400">Drop me an email!</a>
       </p>
     </article>
+    <article id="blog3" class="bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-800 mb-9 scroll-mt-24">
+      <h3 class="text-lg font-semibold mb-1">GAN vs VAE vs Diffusion Models: A Modern Comparison</h3>
+      <div class="text-xs text-gray-400 mb-2">Published: 8 June 2025</div>
+      
+      <p class="text-sm text-gray-200 mb-2">
+        <b>Generative models</b> have revolutionized the way we create images, audio, and even text with artificial intelligence. The three most prominent families today are <b>GANs</b> (Generative Adversarial Networks), <b>VAEs</b> (Variational Autoencoders), and <b>Diffusion Models</b>. This post offers a side-by-side look at their approaches, strengths, and where you might use each.
+      </p>
+    
+      <h4 class="font-semibold text-cyan-400 mt-4 mb-1">GANs: Generative Adversarial Networks</h4>
+      <p class="text-sm text-gray-200 mb-2">
+        <b>GANs</b> use a “game” between two networks: a <b>generator</b> that tries to make fake data look real, and a <b>discriminator</b> that tries to tell fake from real. Over time, the generator learns to produce remarkably realistic samples.
+      </p>
+      <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
+        <li><b>Strengths:</b> Can create highly sharp, high-resolution images; widely used for photorealistic art and deepfakes.</li>
+        <li><b>Weaknesses:</b> Training can be unstable (mode collapse, vanishing gradients); sometimes lacks diversity.</li>
+        <li><b>Notable use cases:</b> DeepFake, StyleGAN, super-resolution, image-to-image translation (pix2pix, CycleGAN).</li>
+      </ul>
+    
+      <h4 class="font-semibold text-cyan-400 mt-4 mb-1">VAEs: Variational Autoencoders</h4>
+      <p class="text-sm text-gray-200 mb-2">
+        <b>VAEs</b> encode data into a lower-dimensional <b>latent space</b> and decode back to samples, using probability to encourage smoothness and variation. They optimize both how well they reconstruct data and how close the latent space matches a normal distribution.
+      </p>
+      <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
+        <li><b>Strengths:</b> Stable, easy to train, provides explicit latent variables for control, interpolation, and clustering.</li>
+        <li><b>Weaknesses:</b> Output can be blurry compared to GANs or diffusion; less suited for ultra-high-res images.</li>
+        <li><b>Notable use cases:</b> Representation learning, anomaly detection, controllable generation, semi-supervised learning.</li>
+      </ul>
+    
+      <h4 class="font-semibold text-cyan-400 mt-4 mb-1">Diffusion Models</h4>
+      <p class="text-sm text-gray-200 mb-2">
+        <b>Diffusion models</b> start with pure noise and iteratively “denoise” it, learning to reverse a random noising process. They excel at high-fidelity, diverse samples and have become the go-to method for text-to-image generation.
+      </p>
+      <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
+        <li><b>Strengths:</b> Extremely high-quality outputs, stable training, flexible (can be conditioned on text, etc.).</li>
+        <li><b>Weaknesses:</b> Traditionally slow to sample (many steps), but new fast samplers help.</li>
+        <li><b>Notable use cases:</b> DALL·E 2, Stable Diffusion, Imagen, molecular and scientific simulation.</li>
+      </ul>
+    
+      <h4 class="font-semibold text-cyan-400 mt-4 mb-1">Side-by-Side Comparison</h4>
+      <table class="w-full text-xs text-gray-200 mb-4 border-collapse">
+        <thead>
+          <tr>
+            <th class="border-b border-gray-700 py-2 text-left">Model</th>
+            <th class="border-b border-gray-700 py-2 text-left">Core Idea</th>
+            <th class="border-b border-gray-700 py-2 text-left">Strengths</th>
+            <th class="border-b border-gray-700 py-2 text-left">Weaknesses</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="py-2">GAN</td>
+            <td>Adversarial training (generator vs. discriminator)</td>
+            <td>Sharp, realistic samples</td>
+            <td>Unstable, mode collapse</td>
+          </tr>
+          <tr>
+            <td class="py-2">VAE</td>
+            <td>Probabilistic encoding/decoding</td>
+            <td>Stable, interpretable latent space</td>
+            <td>Blurry outputs</td>
+          </tr>
+          <tr>
+            <td class="py-2">Diffusion</td>
+            <td>Iterative denoising</td>
+            <td>Best fidelity, flexible</td>
+            <td>Slow sampling (improving!)</td>
+          </tr>
+        </tbody>
+      </table>
+    
+      <h4 class="font-semibold text-cyan-400 mt-4 mb-1">Mathematical Glimpse</h4>
+      <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
+        <li>
+          <b>GAN loss:</b> <span>\[
+          \min_G \max_D \mathbb{E}_{x \sim p_\text{data}} [\log D(x)] + \mathbb{E}_{z \sim p(z)} [\log (1-D(G(z)))]
+          \]</span>
+        </li>
+        <li>
+          <b>VAE loss:</b> <span>\[
+          \mathcal{L}_\text{VAE} = \mathbb{E}_{q(z|x)}[\log p(x|z)] - \text{KL}(q(z|x)\,\|\,p(z))
+          \]</span>
+        </li>
+        <li>
+          <b>Diffusion step:</b> <span>$$x_t = \sqrt{\alpha_t} x_0 + \sqrt{1 - \alpha_t}\,\epsilon$$</span>
+        </li>
+      </ul>
+    
+      <h4 class="font-semibold text-cyan-400 mt-4 mb-1">Which Should I Use?</h4>
+      <p class="text-sm text-gray-200 mb-2">
+        <b>GANs</b> are great for tasks demanding photorealism and when you can manage training tricks. <b>VAEs</b> are fantastic for learning interpretable representations and unsupervised learning. <b>Diffusion models</b> are now preferred for the highest-quality, most flexible generation—especially for images and cross-modal tasks.
+      </p>
+    
+      <h4 class="font-semibold text-cyan-400 mt-4 mb-1">Further Reading</h4>
+      <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
+        <li>
+          <a href="https://arxiv.org/abs/1406.2661" target="_blank" class="underline hover:text-cyan-400">GANs: Goodfellow et al. (2014)</a>
+        </li>
+        <li>
+          <a href="https://arxiv.org/abs/1312.6114" target="_blank" class="underline hover:text-cyan-400">VAEs: Kingma & Welling (2013)</a>
+        </li>
+        <li>
+          <a href="https://arxiv.org/abs/2006.11239" target="_blank" class="underline hover:text-cyan-400">Diffusion Models: Ho et al. (2020)</a>
+        </li>
+      </ul>
+      <p class="text-sm text-gray-200">
+        Still unsure? <a href="mailto:tanmoydas202231@gmail.com" class="underline hover:text-cyan-400">Let’s discuss!</a>
+      </p>
+   </article>
 
 
 
