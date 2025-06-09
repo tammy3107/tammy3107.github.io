@@ -438,14 +438,14 @@
       <h4 class="font-semibold text-cyan-400 mt-4 mb-1">Mathematical Glimpse</h4>
       <ul class="list-disc ml-5 text-sm text-gray-200 mb-2">
         <li>
-          <b>GAN loss:</b> <span>\[
+          <b>GAN loss:</b> <span>$$
           \min_G \max_D \mathbb{E}_{x \sim p_\text{data}} [\log D(x)] + \mathbb{E}_{z \sim p(z)} [\log (1-D(G(z)))]
-          \]</span>
+          $$</span>
         </li>
         <li>
-          <b>VAE loss:</b> <span>\[
+          <b>VAE loss:</b> <span>$$
           \mathcal{L}_\text{VAE} = \mathbb{E}_{q(z|x)}[\log p(x|z)] - \text{KL}(q(z|x)\,\|\,p(z))
-          \]</span>
+          $$</span>
         </li>
         <li>
           <b>Diffusion step:</b> <span>$$x_t = \sqrt{\alpha_t} x_0 + \sqrt{1 - \alpha_t}\,\epsilon$$</span>
