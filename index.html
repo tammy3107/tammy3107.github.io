@@ -617,43 +617,41 @@ resizeCanvas();
 draw();
 </script>
 <script>
-// ========== Dynamic Blog Dropdown ==========
-
-function buildBlogDropdown() {
+window.addEventListener('DOMContentLoaded', function() {
   const blogDropdown = document.getElementById('blogDropdown');
-  blogDropdown.innerHTML = ''; // clear existing
-  const blogPosts = document.querySelectorAll('#blog article[id][data-title]');
-  blogPosts.forEach(post => {
-    const li = document.createElement('li');
-    const a = document.createElement('a');
-    a.href = `#${post.id}`;
-    a.textContent = post.getAttribute('data-title');
-    a.className = "block px-4 py-2 text-sm hover:bg-cyan-900/20 transition";
-    li.appendChild(a);
-    blogDropdown.appendChild(li);
-  });
+  const btn = document.getElementById('blogMenuBtn');
+  const menu = blogDropdown;
 
-  // Attach smooth scroll to each link right after they are created
-  blogDropdown.querySelectorAll('a').forEach(link => {
-    link.onclick = function(e) {
-      const id = this.getAttribute('href').replace('#', '');
-      const el = document.getElementById(id);
-      if (el) {
-        e.preventDefault();
-        blogDropdown.classList.add('hidden');
-        blogDropdown.classList.remove('open');
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    };
-  });
-}
+  // Build the dropdown menu dynamically
+  function buildBlogDropdown() {
+    blogDropdown.innerHTML = '';
+    // Find all articles INSIDE #blog that have id and data-title
+    document.querySelectorAll('#blog article[id][data-title]').forEach(post => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = `#${post.id}`;
+      a.textContent = post.getAttribute('data-title');
+      a.className = "block px-4 py-2 text-sm hover:bg-cyan-900/20 transition";
+      li.appendChild(a);
+      blogDropdown.appendChild(li);
 
-document.addEventListener('DOMContentLoaded', function() {
+      // Attach smooth scroll handler
+      a.addEventListener('click', function(e) {
+        const id = this.getAttribute('href').replace('#', '');
+        const el = document.getElementById(id);
+        if (el) {
+          e.preventDefault();
+          blogDropdown.classList.add('hidden');
+          blogDropdown.classList.remove('open');
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  }
+
   buildBlogDropdown();
 
-  // Dropdown open/close logic
-  const btn = document.getElementById('blogMenuBtn');
-  const menu = document.getElementById('blogDropdown');
+  // Open/close dropdown logic
   btn.addEventListener('click', function(e) {
     e.stopPropagation();
     menu.classList.toggle('hidden');
@@ -668,6 +666,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
+
 
 
 
