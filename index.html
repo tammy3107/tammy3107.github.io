@@ -632,41 +632,43 @@ function buildBlogDropdown() {
     li.appendChild(a);
     blogDropdown.appendChild(li);
   });
-}
-document.addEventListener('DOMContentLoaded', buildBlogDropdown);
 
-// --- Dropdown open/close logic (unchanged) ---
-const btn = document.getElementById('blogMenuBtn');
-const menu = document.getElementById('blogDropdown');
-btn.addEventListener('click', function(e) {
-  e.stopPropagation();
-  menu.classList.toggle('hidden');
-  menu.classList.toggle('open');
-});
-document.body.addEventListener('click', function() {
-  menu.classList.add('hidden');
-  menu.classList.remove('open');
-});
-menu.addEventListener('click', function(e) {
-  e.stopPropagation();
-});
-
-// --- Smooth scroll on menu link click
-document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('#blogDropdown a').forEach(link => {
-    link.addEventListener('click', function(e) {
+  // Attach smooth scroll to each link right after they are created
+  blogDropdown.querySelectorAll('a').forEach(link => {
+    link.onclick = function(e) {
       const id = this.getAttribute('href').replace('#', '');
       const el = document.getElementById(id);
       if (el) {
         e.preventDefault();
-        menu.classList.add('hidden');
-        menu.classList.remove('open');
+        blogDropdown.classList.add('hidden');
+        blogDropdown.classList.remove('open');
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    });
+    };
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  buildBlogDropdown();
+
+  // Dropdown open/close logic
+  const btn = document.getElementById('blogMenuBtn');
+  const menu = document.getElementById('blogDropdown');
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    menu.classList.toggle('hidden');
+    menu.classList.toggle('open');
+  });
+  document.body.addEventListener('click', function() {
+    menu.classList.add('hidden');
+    menu.classList.remove('open');
+  });
+  menu.addEventListener('click', function(e) {
+    e.stopPropagation();
   });
 });
 </script>
+
 
 
 
