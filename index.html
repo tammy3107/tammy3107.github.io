@@ -74,13 +74,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
           </svg>
         </button>
-        <ul class="dropdown-menu absolute right-0 mt-2 min-w-[230px] bg-gray-900 border border-gray-800 rounded-xl shadow-xl py-2 z-40 hidden">
-          <li>
-            <a href="#blog1" class="block px-4 py-2 text-sm hover:bg-cyan-900/20 transition">How I Built My Portfolio with HTML & Tailwind</a>
-          </li>
-          <li>
-            <a href="#blog2" class="block px-4 py-2 text-sm hover:bg-cyan-900/20 transition">Understanding Diffusion Models in AI</a>
-          </li>
+        <ul id="blogDropdown" class="dropdown-menu absolute right-0 mt-2 min-w-[230px] bg-gray-900 border border-gray-800 rounded-xl shadow-xl py-2 z-40 hidden">
+          <!-- Blog links will be inserted here by JS -->
         </ul>
       </li>
     </ul>
@@ -620,6 +615,57 @@ function draw(now = 0) {
 }
 resizeCanvas();
 draw();
+</script>
+<script>
+// ========== Dynamic Blog Dropdown ==========
+
+function buildBlogDropdown() {
+  const blogDropdown = document.getElementById('blogDropdown');
+  blogDropdown.innerHTML = ''; // clear existing
+  const blogPosts = document.querySelectorAll('#blog article[id][data-title]');
+  blogPosts.forEach(post => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = `#${post.id}`;
+    a.textContent = post.getAttribute('data-title');
+    a.className = "block px-4 py-2 text-sm hover:bg-cyan-900/20 transition";
+    li.appendChild(a);
+    blogDropdown.appendChild(li);
+  });
+}
+document.addEventListener('DOMContentLoaded', buildBlogDropdown);
+
+// --- Dropdown open/close logic (unchanged) ---
+const btn = document.getElementById('blogMenuBtn');
+const menu = document.getElementById('blogDropdown');
+btn.addEventListener('click', function(e) {
+  e.stopPropagation();
+  menu.classList.toggle('hidden');
+  menu.classList.toggle('open');
+});
+document.body.addEventListener('click', function() {
+  menu.classList.add('hidden');
+  menu.classList.remove('open');
+});
+menu.addEventListener('click', function(e) {
+  e.stopPropagation();
+});
+
+// --- Smooth scroll on menu link click
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('#blogDropdown a').forEach(link => {
+    link.addEventListener('click', function(e) {
+      const id = this.getAttribute('href').replace('#', '');
+      const el = document.getElementById(id);
+      if (el) {
+        e.preventDefault();
+        menu.classList.add('hidden');
+        menu.classList.remove('open');
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+});
 </script>
 
 
