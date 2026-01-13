@@ -139,6 +139,46 @@
     <div class="bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-800 text-base text-gray-200">
       Passionate researcher in computer vision and deep learning, with a strong foundation in mathematics and computer science. Experienced in designing and optimizing advanced neural architectures for medical imaging, NLP, and generative modeling. Driven by curiosity and innovation, I aim to contribute to cutting-edge research in image analysis, representation learning, and computational modeling.
     </div>
+
+    <div class="mt-6 bg-gray-900 rounded-2xl shadow-xl p-6 border border-gray-800">
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <div class="text-cyan-400 font-semibold text-base">Build Your Profile</div>
+          <div class="text-xs text-gray-400 mt-1">Pick a target role and generate a tailored intro you can copy.</div>
+        </div>
+        <button id="profileCopyBtn"
+          class="px-3 py-2 rounded-xl border border-gray-800 hover:border-cyan-400 hover:text-cyan-400 transition text-sm">
+          Copy
+        </button>
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <select id="profileRole"
+          class="bg-gray-950/50 border border-gray-800 rounded-xl px-3 py-2 text-sm outline-none focus:border-cyan-400">
+          <option value="phd">PhD Applicant</option>
+          <option value="research">Research Engineer</option>
+          <option value="cveng">Computer Vision Engineer</option>
+        </select>
+
+        <select id="profileFocus"
+          class="bg-gray-950/50 border border-gray-800 rounded-xl px-3 py-2 text-sm outline-none focus:border-cyan-400">
+          <option value="gen">Generative + Diffusion</option>
+          <option value="seg">3D Segmentation</option>
+          <option value="multimodal">Multimodal Vision</option>
+        </select>
+
+        <button id="profileGenBtn"
+          class="px-3 py-2 rounded-xl border border-cyan-400/30 bg-cyan-950/20 hover:bg-cyan-950/35 hover:border-cyan-400 transition text-sm text-cyan-100">
+          Generate
+        </button>
+      </div>
+
+      <div id="profileOutput"
+        class="mt-4 p-4 rounded-xl border border-gray-800 bg-gray-950/40 text-sm text-gray-200 leading-relaxed">
+        Select a role and focus, then hit Generate.
+      </div>
+    </div>
+
   </section>
 
   <!-- Education -->
@@ -606,7 +646,7 @@
       animateSkills();
     });
   </script>
-  
+
 <script>
 // Interactive canvas background: RAIN / WAVE / PARTICLES
 const canvas = document.getElementById('codeRain');
@@ -1188,6 +1228,66 @@ window.addEventListener('DOMContentLoaded', function() {
   lockCv(!state.cvUnlocked);
   hookSkillHover();
   evaluateCvUnlock();
+})();
+</script>
+<script>
+(() => {
+  const roleEl = document.getElementById("profileRole");
+  const focusEl = document.getElementById("profileFocus");
+  const outEl = document.getElementById("profileOutput");
+  const genBtn = document.getElementById("profileGenBtn");
+  const copyBtn = document.getElementById("profileCopyBtn");
+
+  if (!roleEl || !focusEl || !outEl || !genBtn || !copyBtn) return;
+
+  function buildText(role, focus) {
+    const focusMap = {
+      gen: "generative modeling and diffusion-based synthesis",
+      seg: "3D segmentation and volumetric learning",
+      multimodal: "multimodal perception (RGB/thermal) and representation learning",
+    };
+
+    const focusLine = focusMap[focus] || focusMap.gen;
+
+    if (role === "phd") {
+      return `I’m a Computer Vision and Deep Learning researcher with hands-on experience taking end-to-end projects from dataset design to deployment. My recent work focuses on ${focusLine}, where I enjoy combining strong mathematical intuition with practical engineering. I’m now looking for a PhD environment where I can push this work toward robust, publishable research and real-world impact.`;
+    }
+
+    if (role === "research") {
+      return `I’m a research-oriented engineer working at the intersection of Computer Vision and deep learning. I’ve built complete pipelines—from data creation and model design to evaluation and deployment—and I’m especially interested in ${focusLine}. I like shipping reliable experiments, iterating quickly, and turning research ideas into systems that work outside the lab.`;
+    }
+
+    // cv engineer
+    return `I’m a Computer Vision engineer with a strong deep learning foundation and a practical, end-to-end mindset. I’ve worked on real pipelines including data preparation, model training, optimization, and deployment, with a particular focus on ${focusLine}. I enjoy writing clean, reliable code and delivering models that perform under real constraints.`;
+  }
+
+  function render() {
+    const text = buildText(roleEl.value, focusEl.value);
+    outEl.textContent = text;
+  }
+
+  genBtn.addEventListener("click", render);
+
+  copyBtn.addEventListener("click", async () => {
+    const text = outEl.textContent.trim();
+    if (!text || text.includes("Select a role")) return;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      copyBtn.textContent = "Copied";
+      setTimeout(() => (copyBtn.textContent = "Copy"), 1200);
+    } catch {
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+      copyBtn.textContent = "Copied";
+      setTimeout(() => (copyBtn.textContent = "Copy"), 1200);
+    }
+  });
 })();
 </script>
 
