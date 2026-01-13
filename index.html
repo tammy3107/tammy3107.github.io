@@ -81,6 +81,32 @@
     </ul>
   </nav>
 
+  <!-- Game HUD -->
+  <div id="gameHud" class="fixed top-4 right-4 z-[9999] w-[260px] bg-gray-950/80 backdrop-blur border border-gray-800 rounded-2xl shadow-xl p-4 text-xs">
+    <div class="flex items-start justify-between gap-2">
+      <div>
+        <div class="text-cyan-400 font-semibold tracking-wide">Journey Progress</div>
+        <div id="hudLevel" class="text-gray-200 mt-1">Level: —</div>
+        <div id="hudLevels" class="text-gray-400 mt-0.5">Completed: 0/6</div>
+      </div>
+      <button id="resetProgressBtn" class="px-2 py-1 rounded-lg border border-gray-800 hover:border-cyan-400 hover:text-cyan-400 transition">
+        Reset
+      </button>
+    </div>
+
+    <div class="mt-3 border-t border-gray-800 pt-3 space-y-1 text-gray-300">
+      <div id="hudMiniProjects">Projects opened: 0/2</div>
+      <div id="hudMiniSkills">Skills hovered: 0/—</div>
+      <div id="hudMiniBlogs">Blogs read: 0/1</div>
+    </div>
+
+    <div class="mt-3 text-[11px] text-gray-500">
+      Tip: Explore sections to unlock the CV.
+    </div>
+  </div>
+
+  <!-- Toasts -->
+  <div id="toastHost" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 items-center pointer-events-none"></div>
   <!-- HEADER/HERO -->
   <header class="pt-8 pb-5 text-center fade-in">
     <img src="me.png" alt="Tanmoy Das" class="mx-auto w-40 h-40 rounded-full mb-6 border-4 border-gray-800 shadow-2xl"/>
@@ -90,6 +116,16 @@
       <a href="https://github.com/tammy3107" target="_blank" aria-label="GitHub" class="hover:text-cyan-400"><i data-lucide="github" class="w-6 h-6"></i></a>
       <a href="https://www.linkedin.com/in/tanmoy-das-15926014a/" target="_blank" aria-label="LinkedIn" class="hover:text-cyan-400"><i data-lucide="linkedin" class="w-6 h-6"></i></a>
       <a href="mailto:tanmoydas202231@gmail.com" aria-label="Email" class="hover:text-cyan-400"><i data-lucide="mail" class="w-6 h-6"></i></a>
+    </div>
+    <div class="mt-5 flex justify-center">
+      <button id="cvBtn"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-800 bg-gray-900/60 text-gray-400 cursor-not-allowed transition"
+        disabled
+        aria-disabled="true"
+        title="Complete the journey to unlock">
+        <span id="cvBtnIcon">🔒</span>
+        <span id="cvBtnText">Unlock CV (Complete 4 levels)</span>
+      </button>
     </div>
     <div class="text-gray-400 text-sm mt-2">Bonn, Germany | +49 1573 9675110</div>
   </header>
@@ -230,7 +266,6 @@
       <!-- Skill cards injected by JS -->
     </div>
   </section>
-
   <!-- Blog Section -->
   <section id="blog" class="fade-in container mx-auto max-w-3xl mb-16 px-6 scroll-mt-20">
     <div class="flex items-center gap-3 mb-4">
@@ -666,7 +701,293 @@ window.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
+<script>
+(() => {
+  // ----------------------------
+  //        GAME CONFIG
+  // ----------------------------
+  const LEVELS = [
+    { id: "about",      name: "Level 1: The Researcher",    achievement: "Curious Mind" },
+    { id: "education",  name: "Level 2: The Scholar",       achievement: "Academic Foundation" },
+    { id: "experience", name: "Level 3: The Engineer",      achievement: "Applied Researcher" },
+    { id: "projects",   name: "Level 4: The Builder",       achievement: "Hands-on Builder" },
+    { id: "skills",     name: "Level 5: The Skill Tree",    achievement: "Skill Discovery" },
+    { id: "blog",       name: "Level 6: The Thinker",       achievement: "Knowledge Trail" },
+  ];
 
+  const STORAGE_KEY = "tdd_portfolio_game_v1";
+
+  const DEFAULT_STATE = {
+    completedSections: {},     // {about:true,...}
+    achievements: {},          // { "Curious Mind": true, ... }
+    projectsOpened: 0,
+    skillsHovered: {},         // keyed by index
+    blogsRead: {},             // keyed by article id
+    cvUnlocked: false,
+    lastLevelId: null,
+  };
+
+  // ----------------------------
+  //        STATE HELPERS
+  // ----------------------------
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return structuredClone(DEFAULT_STATE);
+      const parsed = JSON.parse(raw);
+      return { ...structuredClone(DEFAULT_STATE), ...parsed };
+    } catch {
+      return structuredClone(DEFAULT_STATE);
+    }
+  }
+
+  function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function resetState() {
+    state = structuredClone(DEFAULT_STATE);
+    saveState();
+    updateHud();
+    lockCv(true);
+    toast("Progress reset.", "info");
+  }
+
+  function completedCount() {
+    return Object.keys(state.completedSections).length;
+  }
+
+  function hasAchievement(name) {
+    return !!state.achievements[name];
+  }
+
+  function unlockAchievement(name) {
+    if (state.achievements[name]) return;
+    state.achievements[name] = true;
+    saveState();
+    toast(`Achievement Unlocked: ${name}`, "success");
+  }
+
+  // ----------------------------
+  //             UI
+  // ----------------------------
+  const hudLevelEl = document.getElementById("hudLevel");
+  const hudLevelsEl = document.getElementById("hudLevels");
+  const hudMiniProjectsEl = document.getElementById("hudMiniProjects");
+  const hudMiniSkillsEl = document.getElementById("hudMiniSkills");
+  const hudMiniBlogsEl = document.getElementById("hudMiniBlogs");
+  const resetBtn = document.getElementById("resetProgressBtn");
+
+  const toastHost = document.getElementById("toastHost");
+
+  const cvBtn = document.getElementById("cvBtn");
+  const cvBtnText = document.getElementById("cvBtnText");
+  const cvBtnIcon = document.getElementById("cvBtnIcon");
+
+  function toast(message, type="info") {
+    const el = document.createElement("div");
+    el.className =
+      "pointer-events-none px-4 py-2 rounded-xl border text-sm shadow-xl " +
+      (type === "success"
+        ? "bg-cyan-950/70 border-cyan-400/40 text-cyan-100"
+        : "bg-gray-950/70 border-gray-700 text-gray-200");
+    el.textContent = message;
+    toastHost.appendChild(el);
+
+    setTimeout(() => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(6px)";
+      el.style.transition = "all 250ms ease";
+    }, 2200);
+
+    setTimeout(() => el.remove(), 2600);
+  }
+
+  function lockCv(forceLocked = false) {
+    const locked = forceLocked ? true : !state.cvUnlocked;
+    if (locked) {
+      cvBtn.disabled = true;
+      cvBtn.setAttribute("aria-disabled", "true");
+      cvBtn.className =
+        "inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-800 bg-gray-900/60 text-gray-400 cursor-not-allowed transition";
+      cvBtnIcon.textContent = "🔒";
+      cvBtnText.textContent = "Unlock CV (Complete 4 levels)";
+    } else {
+      cvBtn.disabled = false;
+      cvBtn.setAttribute("aria-disabled", "false");
+      cvBtn.className =
+        "inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-cyan-400/40 bg-cyan-950/30 text-cyan-100 hover:border-cyan-400 hover:bg-cyan-950/50 transition";
+      cvBtnIcon.textContent = "📄";
+      cvBtnText.textContent = "Download CV";
+    }
+  }
+
+  function updateHud() {
+    const total = LEVELS.length;
+    const done = completedCount();
+
+    const current = state.lastLevelId
+      ? (LEVELS.find(l => l.id === state.lastLevelId)?.name || "—")
+      : "—";
+
+    hudLevelEl.textContent = `Level: ${current}`;
+    hudLevelsEl.textContent = `Completed: ${done}/${total}`;
+
+    hudMiniProjectsEl.textContent = `Projects opened: ${Math.min(state.projectsOpened, 2)}/2`;
+
+    const skillTotal = document.querySelectorAll("#skills-list > div").length || 0;
+    const skillDone = Object.keys(state.skillsHovered).length;
+    hudMiniSkillsEl.textContent = `Skills hovered: ${skillDone}/${skillTotal || "—"}`;
+
+    const blogDone = Object.keys(state.blogsRead).length;
+    hudMiniBlogsEl.textContent = `Blogs read: ${Math.min(blogDone, 1)}/1`;
+  }
+
+  function evaluateCvUnlock() {
+    const done = completedCount();
+
+    const advancedUnlock =
+      done >= 4 ||
+      (done >= 3 && (hasAchievement("System Builder") || hasAchievement("Skill Mastery") || hasAchievement("Knowledge Seeker")));
+
+    if (advancedUnlock && !state.cvUnlocked) {
+      state.cvUnlocked = true;
+      saveState();
+      lockCv(false);
+      toast("Final Unlock: CV is now available.", "success");
+    }
+  }
+
+  // ----------------------------
+  //      EVENT TRACKING
+  // ----------------------------
+  let state = loadState();
+
+  resetBtn?.addEventListener("click", resetState);
+
+  // CV click handler
+  cvBtn?.addEventListener("click", () => {
+    // Placeholder link; keep it simple for GitHub Pages
+    const url = "resume.pdf";
+    // We can't truly verify file existence without fetching; keep UX friendly.
+    window.open(url, "_blank", "noopener,noreferrer");
+  });
+
+  // Section completion + current level via IntersectionObserver
+  const sectionObserver = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+
+      const id = entry.target.id;
+      const level = LEVELS.find(l => l.id === id);
+      if (!level) continue;
+
+      // set current level
+      state.lastLevelId = id;
+      saveState();
+      updateHud();
+
+      // complete section once
+      if (!state.completedSections[id]) {
+        state.completedSections[id] = true;
+        saveState();
+        unlockAchievement(level.achievement);
+        updateHud();
+        evaluateCvUnlock();
+      }
+    }
+  }, { threshold: 0.5 });
+
+  LEVELS.forEach(l => {
+    const el = document.getElementById(l.id);
+    if (el) sectionObserver.observe(el);
+  });
+
+  // Projects: count GitHub link clicks inside #projects
+  const projectsSection = document.getElementById("projects");
+  if (projectsSection) {
+    projectsSection.addEventListener("click", (e) => {
+      const a = e.target.closest("a");
+      if (!a) return;
+      if (!a.href) return;
+
+      // count only external project links
+      if (a.href.includes("github.com")) {
+        state.projectsOpened += 1;
+        saveState();
+        updateHud();
+
+        if (state.projectsOpened >= 2) {
+          unlockAchievement("System Builder");
+          evaluateCvUnlock();
+        }
+      }
+    });
+  }
+
+  // Skills: track unique hover on skill cards (#skills-list children)
+  const skillsContainer = document.getElementById("skills-list");
+  function hookSkillHover() {
+    if (!skillsContainer) return;
+    const cards = Array.from(skillsContainer.children);
+
+    cards.forEach((card, idx) => {
+      card.addEventListener("mouseenter", () => {
+        if (state.skillsHovered[idx]) return;
+        state.skillsHovered[idx] = true;
+        saveState();
+        updateHud();
+
+        const total = cards.length;
+        const done = Object.keys(state.skillsHovered).length;
+        if (total > 0 && done >= total) {
+          unlockAchievement("Skill Mastery");
+          evaluateCvUnlock();
+        }
+      }, { passive: true });
+    });
+  }
+
+  // Blog read: count “read” when an article is in view for >= 12s
+  const blogArticles = Array.from(document.querySelectorAll("#blog article[id]"));
+  const readTimers = new Map();
+
+  const blogObserver = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      const article = entry.target;
+      const id = article.id;
+
+      if (entry.isIntersecting) {
+        if (state.blogsRead[id]) continue;
+        if (readTimers.has(id)) continue;
+
+        const t = setTimeout(() => {
+          if (state.blogsRead[id]) return;
+          state.blogsRead[id] = true;
+          saveState();
+          updateHud();
+          unlockAchievement("Knowledge Seeker");
+          evaluateCvUnlock();
+        }, 12000);
+
+        readTimers.set(id, t);
+      } else {
+        const t = readTimers.get(id);
+        if (t) clearTimeout(t);
+        readTimers.delete(id);
+      }
+    }
+  }, { threshold: 0.6 });
+
+  blogArticles.forEach(a => blogObserver.observe(a));
+
+  // Init UI based on saved state
+  updateHud();
+  lockCv(!state.cvUnlocked);
+  hookSkillHover();
+  evaluateCvUnlock();
+})();
+</script>
 
 
 
