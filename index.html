@@ -606,51 +606,253 @@
       animateSkills();
     });
   </script>
+  
 <script>
-// Slower and smooth code rain background
+// Interactive canvas background: RAIN / WAVE / PARTICLES
 const canvas = document.getElementById('codeRain');
 const ctx = canvas.getContext('2d');
-let width, height, columns, drops, fontSize, lastDraw = 0;
-const codeChars = "01<>{}[]();=+-*/&|^%$#@!";
 
-// Slower speed: smaller = slower (e.g. 0.7 is slow, 1.0 is default, 1.5 is fast)
-const RAIN_SPEED = 0.6;  
+let width, height, fontSize, columns, drops, lastDraw = 0;
+
+const codeChars = "01<>{}[]();=+-*/&|^%$#@!";
+const RAIN_SPEED = 0.6; // keep your slow vibe
+
+// Interaction state
+const mouse = { x: -9999, y: -9999, active: false };
+const pulses = []; // {x,y,t0}
+
+// Modes
+const MODES = ["RAIN", "WAVE", "PARTICLES"];
+let modeIndex = 0;
 
 function resizeCanvas() {
   width = window.innerWidth;
   height = window.innerHeight;
   canvas.width = width;
   canvas.height = height;
+
   fontSize = Math.max(14, Math.min(24, width / 80));
   columns = Math.floor(width / fontSize);
-  // Use float for smooth slow fall
+
   drops = Array(columns).fill(1 + Math.random() * 10);
 }
 window.addEventListener('resize', resizeCanvas);
 
-function draw(now = 0) {
-  // Throttle frame rate for extra smoothness (about 40 FPS)
-  if (now - lastDraw < 25) { requestAnimationFrame(draw); return; }
-  lastDraw = now;
+function addPulse(x, y) {
+  pulses.push({ x, y, t0: performance.now() });
+  // keep pulses bounded
+  if (pulses.length > 6) pulses.shift();
+}
+
+function drawRain(now) {
+  // fade
   ctx.fillStyle = "rgba(24,24,27,0.18)";
   ctx.fillRect(0, 0, width, height);
 
   ctx.font = fontSize + "px 'Fira Mono', 'Consolas', monospace";
   ctx.fillStyle = "#22d3eeCC";
 
-  for (let i = 0; i < columns; i++) {
-    const char = codeChars[Math.floor(Math.random() * codeChars.length)];
-    ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+  // pulse effect (shockwave ring)
+  for (const p of pulses) {
+    const dt = (now - p.t0) / 1000;
+    const r = dt * 420;
+    const alpha = Math.max(0, 0.22 - dt * 0.18);
+    if (alpha <= 0) continue;
 
-    // Drops increment slower
-    if (drops[i] * fontSize > height && Math.random() > 0.975) drops[i] = 0;
+    ctx.beginPath();
+    ctx.strokeStyle = `rgba(34,211,238,${alpha})`;
+    ctx.lineWidth = 2;
+    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  const repelRadius = Math.max(80, fontSize * 8);
+  const repelStrength = 1.8; // how much the rain is “pushed”
+
+  for (let i = 0; i < columns; i++) {
+    const x = i * fontSize;
+    let y = drops[i] * fontSize;
+
+    // Mouse repulsion: push drops forward when close
+    if (mouse.active) {
+      const dx = x - mouse.x;
+      const dy = y - mouse.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < repelRadius) {
+        const push = (1 - d / repelRadius) * repelStrength;
+        drops[i] += push; // push downwards faster near mouse
+      }
+    }
+
+    // Pulse repulsion: shockwave pushes nearby drops
+    for (const p of pulses) {
+      const dt = (now - p.t0) / 1000;
+      const r = dt * 420;
+      const ringW = 60;
+      const dx = x - p.x;
+      const dy = y - p.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (Math.abs(d - r) < ringW) {
+        drops[i] += 1.2; // kick
+      }
+    }
+
+    const char = codeChars[Math.floor(Math.random() * codeChars.length)];
+    ctx.fillText(char, x, y);
+
+    if (y > height && Math.random() > 0.975) drops[i] = 0;
     drops[i] += RAIN_SPEED;
   }
+}
+
+function drawWave(now) {
+  ctx.fillStyle = "rgba(24,24,27,0.20)";
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.font = fontSize + "px 'Fira Mono', 'Consolas', monospace";
+  ctx.fillStyle = "#22d3eeAA";
+
+  const t = now / 1000;
+  const amp = Math.max(10, fontSize * 1.2);
+  const freq = 0.35;
+
+  for (let i = 0; i < columns; i++) {
+    const x = i * fontSize;
+
+    // wave baseline + mouse perturbation
+    let y = height * 0.5 + Math.sin(t * 2 + i * freq) * amp;
+
+    if (mouse.active) {
+      const dx = x - mouse.x;
+      const d = Math.abs(dx);
+      const influence = Math.max(0, 1 - d / 240);
+      y += (mouse.y - y) * influence * 0.2;
+    }
+
+    // pulses disturb the wave
+    for (const p of pulses) {
+      const dt = (now - p.t0) / 1000;
+      const r = dt * 520;
+      const dx2 = x - p.x;
+      const d2 = Math.abs(dx2);
+      const influence = Math.max(0, 1 - Math.abs(d2 - r) / 180);
+      y += influence * 30 * Math.sin(dt * 10);
+    }
+
+    const char = codeChars[(i + Math.floor(t * 8)) % codeChars.length];
+    ctx.fillText(char, x, y);
+  }
+}
+
+let particles = [];
+function seedParticles() {
+  particles = Array.from({ length: Math.min(220, Math.floor((width * height) / 9000)) }, () => ({
+    x: Math.random() * width,
+    y: Math.random() * height,
+    vx: (Math.random() - 0.5) * 0.6,
+    vy: (Math.random() - 0.5) * 0.6,
+    c: codeChars[Math.floor(Math.random() * codeChars.length)],
+  }));
+}
+function drawParticles(now) {
+  ctx.fillStyle = "rgba(24,24,27,0.18)";
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.font = fontSize + "px 'Fira Mono', 'Consolas', monospace";
+  ctx.fillStyle = "#22d3ee99";
+
+  const t = now / 1000;
+
+  for (const p of particles) {
+    // gentle drift
+    p.x += p.vx;
+    p.y += p.vy;
+
+    // wrap
+    if (p.x < -10) p.x = width + 10;
+    if (p.x > width + 10) p.x = -10;
+    if (p.y < -10) p.y = height + 10;
+    if (p.y > height + 10) p.y = -10;
+
+    // mouse attraction/repel (subtle)
+    if (mouse.active) {
+      const dx = p.x - mouse.x;
+      const dy = p.y - mouse.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < 220) {
+        const k = (1 - d / 220) * 0.08;
+        p.vx += dx * k * 0.01;
+        p.vy += dy * k * 0.01;
+      }
+    }
+
+    // pulse burst
+    for (const pl of pulses) {
+      const dt = (now - pl.t0) / 1000;
+      const r = dt * 520;
+      const dx = p.x - pl.x;
+      const dy = p.y - pl.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (Math.abs(d - r) < 70) {
+        p.vx += dx * 0.0006;
+        p.vy += dy * 0.0006;
+      }
+    }
+
+    // damp velocity
+    p.vx *= 0.995;
+    p.vy *= 0.995;
+
+    // animate character a bit
+    if ((p.x + p.y + t * 40) % 19 < 0.5) {
+      p.c = codeChars[Math.floor(Math.random() * codeChars.length)];
+    }
+    ctx.fillText(p.c, p.x, p.y);
+  }
+}
+
+function draw(now = 0) {
+  if (now - lastDraw < 25) { requestAnimationFrame(draw); return; }
+  lastDraw = now;
+
+  const mode = MODES[modeIndex];
+
+  // clean pulses that faded out
+  for (let i = pulses.length - 1; i >= 0; i--) {
+    if ((now - pulses[i].t0) > 1400) pulses.splice(i, 1);
+  }
+
+  if (mode === "RAIN") drawRain(now);
+  else if (mode === "WAVE") drawWave(now);
+  else drawParticles(now);
+
   requestAnimationFrame(draw);
 }
+
+// Mouse interaction
+window.addEventListener("mousemove", (e) => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+  mouse.active = true;
+}, { passive: true });
+
+window.addEventListener("mouseleave", () => {
+  mouse.active = false;
+}, { passive: true });
+
+// Use your existing transparent overlay for clicks
+const clickLayer = document.getElementById("codeRainClick");
+clickLayer?.addEventListener("click", (e) => {
+  addPulse(e.clientX, e.clientY);
+  modeIndex = (modeIndex + 1) % MODES.length; // click cycles modes
+  // quick feedback without UI: tiny pulse already shows it
+}, { passive: true });
+
 resizeCanvas();
+seedParticles();
 draw();
 </script>
+
 <script>
 window.addEventListener('DOMContentLoaded', function() {
   const blogDropdown = document.getElementById('blogDropdown');
