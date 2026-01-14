@@ -629,41 +629,77 @@
       });
 
       // --------- Animated Skills Section ---------
+      // --------- Animated Skills Section (Custom Icons from Resume) ---------
       const skills = [
-        { icon: "python",     label: "Python",           color: "#ffde57" },
-        { icon: "c-plus-plus",label: "C++",              color: "#00599C" },
-        { icon: "git-branch", label: "Git",              color: "#F1502F" },
-        { icon: "docker",     label: "Docker",           color: "#2496ED" },
-        { icon: "layers",     label: "PyTorch",          color: "#EE4C2C" },
-        { icon: "braces",     label: "JAX",              color: "#FFB13B" },
-        { icon: "camera",     label: "OpenCV",           color: "#5C3EE8" },
-        { icon: "function-square",label: "Scikit-Learn", color: "#F7931E" },
-        { icon: "brain-circuit", label: "Deep Learning", color: "#22D3EE" },
-        { icon: "network",    label: "Machine Learning", color: "#A855F7" },
-        { icon: "eye",        label: "Computer Vision",  color: "#8B5CF6" },
-        { icon: "rocket",     label: "Reinforcement Learning", color: "#60A5FA" },
-        { icon: "language",   label: "NLP",              color: "#A3E635" },
-        { icon: "file-type",  label: "LaTeX",            color: "#6366F1" },
+        // Programming
+        { img: "icons/python.png", label: "Python" },
+        { img: "icons/cpp.png", label: "C++" },
+        { img: "icons/latex.png", label: "LaTeX" },
+        { img: "icons/javascript.png", label: "JavaScript" },
+
+        // Core ML / CV
+        { img: "icons/ml.png", label: "Machine Learning" },
+        { img: "icons/dl.png", label: "Deep Learning" },
+        { img: "icons/cv.png", label: "Computer Vision" },
+        { img: "icons/rl.png", label: "Reinforcement Learning" },
+        { img: "icons/stats.png", label: "Statistical Modeling" },
+
+        // LLM / RAG / Systems
+        { img: "icons/rag.png", label: "RAG" },
+        { img: "icons/mcp.png", label: "LLM Agents (MCP)" },
+        { img: "icons/quant.png", label: "Vector Database" },
+
+        // Frameworks & Tools
+        { img: "icons/pytorch.png", label: "PyTorch" },
+        { img: "icons/jax.png", label: "JAX" },
+        { img: "icons/opencv.png", label: "OpenCV" },
+        { img: "icons/sklearn.png", label: "Scikit-Learn" },
+        { img: "icons/docker.png", label: "Docker" },
+        { img: "icons/git.png", label: "Git" },
+
+        // MLOps / Backend
+        { img: "icons/langchain.png", label: "LangChain" },
+        { img: "icons/fastapi.png", label: "FastAPI" },
+        { img: "icons/flask.png", label: "Flask" },
+        { img: "icons/streamlit.png", label: "Streamlit" },
+        { img: "icons/wandb.png", label: "Weights & Biases" },
+        { img: "icons/mlflow.png", label: "MLflow" },
       ];
-      const container = document.getElementById('skills-list');
+
+      const container = document.getElementById("skills-list");
+      container.innerHTML = "";
+
       skills.forEach((skill, i) => {
-        const card = document.createElement('div');
-        card.className = "flex flex-col items-center bg-gray-800 rounded-2xl shadow p-4 hover:scale-105 transition-all duration-300 opacity-0 translate-y-5";
+        const card = document.createElement("div");
+        card.className =
+          "skill-card flex flex-col items-center bg-gray-800 rounded-2xl shadow p-4 hover:scale-105 transition-all duration-300 opacity-0 translate-y-5";
         card.style.animation = `skill-pop 0.7s cubic-bezier(.33,1.53,.52,1) forwards`;
         card.style.animationDelay = `${i * 120}ms`;
 
-        const iconDiv = document.createElement('div');
+        const iconDiv = document.createElement("div");
         iconDiv.className = "mb-2";
-        iconDiv.innerHTML = `<i data-lucide="${skill.icon}" style="color: ${skill.color}; width:2.2rem;height:2.2rem;"></i>`;
+
+        const img = document.createElement("img");
+        img.src = skill.img;
+        img.alt = skill.label;
+        img.loading = "lazy";
+        img.className = "skill-icon w-9 h-9 object-contain";
+        img.onerror = () => {
+          img.style.opacity = "0.35";
+          img.title = `Missing icon: ${skill.img}`;
+        };
+
+        iconDiv.appendChild(img);
         card.appendChild(iconDiv);
 
-        const label = document.createElement('div');
-        label.className = "text-sm font-medium mt-1 text-gray-100";
+        const label = document.createElement("div");
+        label.className = "text-sm font-medium mt-1 text-gray-100 text-center";
         label.textContent = skill.label;
         card.appendChild(label);
 
         container.appendChild(card);
       });
+
       lucide.createIcons();
 
       // Animate in on scroll
@@ -678,7 +714,7 @@
       window.addEventListener('scroll', animateSkills);
       animateSkills();
     });
-  </script>
+ </script>
 
 <script>
 // Interactive canvas background: RAIN / WAVE / PARTICLES
