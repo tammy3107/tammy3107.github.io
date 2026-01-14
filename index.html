@@ -581,6 +581,137 @@
         Still unsure? <a href="mailto:tanmoydas202231@gmail.com" class="underline hover:text-cyan-400">Let’s discuss!</a>
       </p>
    </article>
+   <article
+    id="blog4"
+    data-title="Flow Matching vs Diffusion Models: A Modern Perspective"
+    class="bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-800 mb-9 scroll-mt-24"
+  >
+    <h3 class="text-lg font-semibold mb-1">
+      Flow Matching vs Diffusion Models: A Modern Perspective
+    </h3>
+    <h4 class="text-xs text-gray-400 mb-3">
+      Published: 14 January 2026
+    </h4>
+
+    <p class="text-sm text-gray-200 mb-3">
+      Diffusion models have become the dominant paradigm in modern generative modeling, powering systems such as Stable Diffusion and DALL·E. More recently, <b>Flow Matching</b> has emerged as an alternative that reframes generation as learning a deterministic transport between distributions.
+    </p>
+
+    <p class="text-sm text-gray-200 mb-3">
+      This post explains what flow matching is, how it works, and how it differs fundamentally from diffusion-based approaches — both conceptually and practically.
+    </p>
+
+    <h4 class="font-semibold text-cyan-400 mt-4 mb-1">
+      Diffusion Models: Learning to Reverse Noise
+    </h4>
+
+    <p class="text-sm text-gray-200 mb-3">
+      Diffusion models define a stochastic forward process that gradually corrupts data into noise, and learn a neural network to reverse this process step-by-step.
+    </p>
+
+    <p class="text-sm text-gray-200 mb-3">
+      The forward process is typically defined as:
+    </p>
+
+    <p class="text-sm text-gray-200 mb-3">
+      $$x_t = \sqrt{\alpha_t} x_0 + \sqrt{1 - \alpha_t}\,\epsilon,\quad \epsilon \sim \mathcal{N}(0, I)$$
+    </p>
+
+    <p class="text-sm text-gray-200 mb-3">
+      Generation requires many sequential denoising steps, making diffusion models computationally expensive at inference time despite their excellent sample quality.
+    </p>
+
+    <h4 class="font-semibold text-cyan-400 mt-4 mb-1">
+      Flow Matching: Learning a Deterministic Transport
+    </h4>
+
+    <p class="text-sm text-gray-200 mb-3">
+      Flow matching takes a different perspective. Instead of learning to remove noise, it learns a continuous vector field that deterministically transports samples from a simple base distribution (e.g., Gaussian noise) to the data distribution.
+    </p>
+
+    <p class="text-sm text-gray-200 mb-3">
+      The model predicts a time-dependent velocity field:
+    </p>
+
+    <p class="text-sm text-gray-200 mb-3">
+      $$\frac{dx}{dt} = v_\theta(x, t)$$
+    </p>
+
+    <p class="text-sm text-gray-200 mb-3">
+      Sampling is performed by integrating this ordinary differential equation (ODE), resulting in smooth and deterministic generation trajectories.
+    </p>
+
+    <h4 class="font-semibold text-cyan-400 mt-4 mb-1">
+      Training Objectives: Where the Difference Matters
+    </h4>
+
+    <p class="text-sm text-gray-200 mb-3">
+      Diffusion models are typically trained via score matching or noise prediction objectives derived from variational bounds. Flow matching, by contrast, uses a direct regression loss on the velocity field:
+    </p>
+
+    <p class="text-sm text-gray-200 mb-3">
+      $$\mathcal{L} = \mathbb{E}\big[\|v_\theta(x_t, t) - v^\*(x_t, t)\|^2\big]$$
+    </p>
+
+    <p class="text-sm text-gray-200 mb-3">
+      This avoids stochastic reverse processes, noise schedules, and likelihood approximations, making the method conceptually cleaner and often easier to optimize.
+    </p>
+
+    <h4 class="font-semibold text-cyan-400 mt-4 mb-1">
+      Sampling: Diffusion vs Flow Matching
+    </h4>
+
+    <div class="overflow-x-auto mb-3">
+      <table class="w-full text-xs text-gray-200 border-collapse">
+        <thead>
+          <tr>
+            <th class="border-b border-gray-700 py-2 text-left">Aspect</th>
+            <th class="border-b border-gray-700 py-2 text-left">Diffusion</th>
+            <th class="border-b border-gray-700 py-2 text-left">Flow Matching</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="py-2">Dynamics</td>
+            <td>Stochastic</td>
+            <td>Deterministic</td>
+          </tr>
+          <tr>
+            <td class="py-2">Inference steps</td>
+            <td>Many (50–1000)</td>
+            <td>Few (10–50)</td>
+          </tr>
+          <tr>
+            <td class="py-2">Noise at inference</td>
+            <td>Yes</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td class="py-2">Trajectory</td>
+            <td>Random</td>
+            <td>Smooth</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 class="font-semibold text-cyan-400 mt-4 mb-1">
+      When Should You Use Which?
+    </h4>
+
+    <p class="text-sm text-gray-200 mb-3">
+      Diffusion models remain the gold standard when maximum sample fidelity and diversity are required. Flow matching is particularly attractive when fast inference, deterministic generation, and training simplicity are priorities.
+    </p>
+
+    <h4 class="font-semibold text-cyan-400 mt-4 mb-1">
+      Final Thoughts
+    </h4>
+
+    <p class="text-sm text-gray-200">
+      Flow matching reframes generative modeling as learning a direct transport between distributions rather than reversing noise. Rather than replacing diffusion models outright, it offers a cleaner and often more efficient alternative that is increasingly influential in modern generative systems.
+    </p>
+  </article>
+
   </section>
 
 
